@@ -1,0 +1,2 @@
+C:/Users/asus/Dokumen/SEMESTER 4/project/buildup/android/app/.cxx/Debug/5u151x6j/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/asus/Dokumen/SEMESTER 4/project/buildup/android/app/.cxx/Debug/5u151x6j/armeabi-v7a/CMakeFiles/rebuild_cache.dir
