@@ -4,14 +4,15 @@ import '../core/validator.dart';
 class InputPassword extends StatefulWidget {
   final TextEditingController controller;
   final bool showValidation;
-  final String?
-      externalError; // 🔹 Tambahkan ini untuk menerima error dari luar
+  final String? externalError;
+  final bool isLogin; // 🔹 Tambahkan parameter isLogin
 
   const InputPassword({
     super.key,
     required this.controller,
     this.showValidation = true,
-    this.externalError, // 🔹 Parameter opsional
+    this.externalError,
+    required this.isLogin, // 🔹 Wajib diisi untuk menentukan validasi
   });
 
   @override
@@ -37,7 +38,6 @@ class _InputPasswordState extends State<InputPassword> {
   @override
   void didUpdateWidget(covariant InputPassword oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 🔹 Perbarui error jika externalError berubah
     if (widget.externalError != oldWidget.externalError) {
       setState(() {
         errorText = widget.externalError;
@@ -52,13 +52,12 @@ class _InputPasswordState extends State<InputPassword> {
   }
 
   void _validatePassword(String value) {
-    final firstInvalidRule = Validator.getFirstInvalidRule(value);
+    final firstInvalidRule =
+        Validator.getFirstInvalidRule(value, widget.isLogin);
 
     setState(() {
       _hasError = firstInvalidRule != null;
-      errorText = _hasError
-          ? firstInvalidRule!["text"]
-          : null; // ✅ Null jika tidak ada error
+      errorText = _hasError ? firstInvalidRule!["text"] : null;
     });
   }
 
@@ -69,7 +68,7 @@ class _InputPasswordState extends State<InputPassword> {
       controller: widget.controller,
       focusNode: _focusNode,
       obscureText: !_isPasswordVisible,
-      onChanged: _validatePassword,
+      onChanged: _validatePassword, // ✅ Langsung pakai fungsi tanpa error
       decoration: InputDecoration(
         labelText: 'Password',
         labelStyle: TextStyle(
@@ -86,28 +85,23 @@ class _InputPasswordState extends State<InputPassword> {
         fillColor: Colors.grey[100],
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide:
-              BorderSide(color: Colors.grey), // Default jika tidak ada error
+          borderSide: BorderSide(color: Colors.grey),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
-            color: _hasError
-                ? Colors.red
-                : Colors.white, // Jika error, merah. Jika tidak, putih.
+            color: _hasError ? Colors.red : Colors.white,
             width: 3,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(
-            color: _hasError
-                ? Colors.red
-                : Colors.black, // Jika error, merah. Jika tidak, hitam.
+            color: _hasError ? Colors.red : Colors.black,
             width: 2,
           ),
         ),
-        errorText: errorText, // ✅ Gunakan error dari internal & external
+        errorText: errorText, // ✅ Menampilkan error jika ada
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Colors.red, width: 2),

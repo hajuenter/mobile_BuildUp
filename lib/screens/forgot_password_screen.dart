@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'otp_verification_screen.dart';
 import '../widgets/input_email.dart';
 import '../widgets/button_primary.dart';
+import '../controllers/send_otp_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -13,6 +13,20 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
+  final SendOtpController _sendOtpController = SendOtpController();
+  bool _isLoading = false;
+
+  void _handleSendOtp() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await _sendOtpController.sendOtp(context, _emailController.text);
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,12 +35,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       appBar: AppBar(
         title: const Text('Lupa Password'),
         backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(
-          color: Colors.black, // Change the back arrow color here
-        ),
-        titleTextStyle: const TextStyle(
-          color: Colors.black, // Change the title color here
-        ),
+        iconTheme: const IconThemeData(color: Colors.black),
+        titleTextStyle: const TextStyle(color: Colors.black),
         elevation: 0,
       ),
       body: SafeArea(
@@ -41,13 +51,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     padding: EdgeInsets.symmetric(
                         horizontal: constraints.maxWidth * 0.08),
                     child: Column(
-                      mainAxisAlignment:
-                          MainAxisAlignment.start, // Perubahan di sini
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         AspectRatio(
                           aspectRatio: 3 / 2,
                           child: SvgPicture.asset(
-                            'assets/logonew.svg', // Gunakan SvgPicture.asset
+                            'assets/logonew.svg',
                             width: constraints.maxWidth * 0.25,
                             height: constraints.maxHeight * 0.12,
                             fit: BoxFit.contain,
@@ -67,16 +76,21 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           height: 50.0,
                           width: double.infinity,
                           child: ButtonPrimary(
-                            text: 'Kirim OTP',
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => OtpVerificationScreen(
-                                      email: _emailController.text),
-                                ),
-                              );
-                            },
+                            text: _isLoading
+                                ? ''
+                                : 'Kirim OTP', // Kosongkan teks jika loading
+                            onPressed: _isLoading ? null : _handleSendOtp,
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors
+                                          .white, // Warna putih agar sesuai dengan tombol
+                                    ),
+                                  )
+                                : null,
                           ),
                         ),
                       ],

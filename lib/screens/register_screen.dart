@@ -5,7 +5,7 @@ import '../widgets/input_password.dart';
 import '../widgets/button_primary.dart';
 import '../widgets/input_text_field.dart';
 import '../widgets/input_konfir_password.dart';
-import '../controller/register_controller.dart';
+import '../controllers/register_controller.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -76,7 +76,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         const SnackBar(
           content: Text(
             'Registrasi berhasil, silakan tunggu konfirmasi dari Admin!',
+            style: TextStyle(color: Colors.white), // Teks putih
           ),
+          backgroundColor: Colors.green, // Latar belakang hijau
         ),
       );
       Navigator.of(context).pushReplacement(
@@ -163,6 +165,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             controller: _passwordController,
                             showValidation: true,
                             externalError: _errors["password"],
+                            isLogin: false,
                           ),
                           const SizedBox(height: 15),
 
@@ -203,7 +206,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   Navigator.of(context).push(
                                     PageRouteBuilder(
                                       transitionDuration:
-                                          const Duration(milliseconds: 300),
+                                          const Duration(milliseconds: 200),
                                       pageBuilder: (context, animation,
                                               secondaryAnimation) =>
                                           const LoginScreen(),

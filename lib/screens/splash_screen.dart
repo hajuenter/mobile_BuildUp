@@ -21,12 +21,12 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 3),
     )..forward();
 
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 8), () {
       Navigator.of(context)
           .pushReplacement(_fadeTransition(const LoginScreen()));
     });
@@ -39,16 +39,39 @@ class _SplashScreenState extends State<SplashScreen>
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: FadeTransition(
-          opacity: _animation,
-          child: SvgPicture.asset(
-            'assets/logonew.svg',
-            width: screenWidth * 0.4, 
-            height: screenHeight * 0.3,
-            fit: BoxFit.contain,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            flex: 3,
+            child: Center(
+              child: FadeTransition(
+                opacity: _animation,
+                child: SvgPicture.asset(
+                  'assets/logonew.svg',
+                  width: screenWidth * 0.4,
+                  height: screenHeight * 0.3,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
           ),
-        ),
+          Expanded(
+            child: FadeTransition(
+              opacity: _animation,
+              child: Align(
+                alignment: Alignment.center,
+                child: Text(
+                  '@Copy Right by B2',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -69,7 +92,7 @@ class _SplashScreenState extends State<SplashScreen>
           child: child,
         );
       },
-      transitionDuration: const Duration(milliseconds: 800),
+      transitionDuration: const Duration(milliseconds: 600),
     );
   }
 }

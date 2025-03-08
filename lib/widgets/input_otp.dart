@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 class InputOtp extends StatelessWidget {
   final TextEditingController controller;
 
-  const InputOtp({Key? key, required this.controller}) : super(key: key);
+  const InputOtp({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {

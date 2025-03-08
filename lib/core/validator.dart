@@ -1,39 +1,46 @@
 class Validator {
   static List<Map<String, dynamic>> getPasswordValidationRules(
-      String password) {
-    return [
+      String password, bool isLogin) {
+    List<Map<String, dynamic>> rules = [
       {"isValid": password.isNotEmpty, "text": "Password tidak boleh kosong"},
-      {"isValid": password.length >= 8, "text": "Minimal 8 karakter"},
-      {
-        "isValid": RegExp(r'[A-Z]').hasMatch(password),
-        "text": "Harus mengandung huruf besar"
-      },
-      {
-        "isValid": RegExp(r'[a-z]').hasMatch(password),
-        "text": "Harus mengandung huruf kecil"
-      },
-      {
-        "isValid": RegExp(r'[0-9]').hasMatch(password),
-        "text": "Harus mengandung angka"
-      },
-      {
-        "isValid": RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(password),
-        "text": "Harus mengandung simbol"
-      },
     ];
+
+    if (!isLogin) {
+      // Hanya berlaku untuk Register
+      rules.addAll([
+        {"isValid": password.length >= 8, "text": "Minimal 8 karakter"},
+        {
+          "isValid": RegExp(r'[A-Z]').hasMatch(password),
+          "text": "Harus mengandung huruf besar"
+        },
+        {
+          "isValid": RegExp(r'[a-z]').hasMatch(password),
+          "text": "Harus mengandung huruf kecil"
+        },
+        {
+          "isValid": RegExp(r'[0-9]').hasMatch(password),
+          "text": "Harus mengandung angka"
+        },
+        {
+          "isValid": RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(password),
+          "text": "Harus mengandung simbol"
+        },
+      ]);
+    }
+
+    return rules;
   }
 
-  /// 🔹 Ambil Aturan Pertama yang Tidak Valid
-  static Map<String, dynamic>? getFirstInvalidRule(String password) {
-    for (var rule in getPasswordValidationRules(password)) {
+  static Map<String, dynamic>? getFirstInvalidRule(
+      String password, bool isLogin) {
+    for (var rule in getPasswordValidationRules(password, isLogin)) {
       if (!rule["isValid"]) {
         return rule;
       }
     }
-    return null; // ✅ Semua valid
+    return null;
   }
 
-  /// 🔹 Validasi Konfirmasi Password
   static String validatePasswordConfirmation(
       String password, String confirmPassword) {
     if (confirmPassword.isEmpty) {
@@ -41,6 +48,6 @@ class Validator {
     } else if (confirmPassword != password) {
       return "Password tidak cocok";
     }
-    return ""; // ✅ Tidak ada error jika cocok
+    return "";
   }
 }

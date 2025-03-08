@@ -39,8 +39,8 @@ dependencies:
   flutter_svg: ^2.0.17
 
 flutter_native_splash:
-  color: "#FFFFFF" 
-  image: assets/logo.png 
+  color: "#FFFFFF"
+  image: assets/logo.png
   android_12:
     image: assets/logo.png
     icon_background_color: "#FFFFFF"

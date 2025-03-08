@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'reset_password_screen.dart';
+import '../controllers/otp_verification_controller.dart';
 import '../widgets/button_primary.dart';
 import '../widgets/input_otp.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,6 +14,7 @@ class OtpVerificationScreen extends StatefulWidget {
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final TextEditingController _otpController = TextEditingController();
+  final OtpVerificationController _controller = OtpVerificationController();
   String _errorMessage = '';
 
   @override
@@ -54,7 +55,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         AspectRatio(
                           aspectRatio: 3 / 2,
                           child: SvgPicture.asset(
-                            'assets/logonew.svg', // Gunakan SvgPicture.asset
+                            'assets/logonew.svg',
                             width: constraints.maxWidth * 0.25,
                             height: constraints.maxHeight * 0.12,
                             fit: BoxFit.contain,
@@ -69,8 +70,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         ),
                         const SizedBox(height: 20),
                         InputOtp(controller: _otpController),
-                        if (_errorMessage
-                            .isNotEmpty) // Tampilkan pesan error jika tidak kosong
+                        if (_errorMessage.isNotEmpty)
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(
@@ -85,24 +85,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           child: ButtonPrimary(
                             text: "Verifikasi OTP",
                             onPressed: () {
-                              String otpCode = _otpController.text;
-                              if (otpCode.length == 4) {
-                                setState(() {
-                                  _errorMessage = ''; // Reset pesan error
-                                });
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ResetPasswordScreen(),
-                                  ),
-                                );
-                              } else {
-                                setState(() {
-                                  _errorMessage =
-                                      'Kode OTP harus 4 digit.'; // Set pesan error
-                                });
-                              }
+                              _controller.verifyOtp(
+                                  context, widget.email, _otpController.text);
                             },
                           ),
                         ),
