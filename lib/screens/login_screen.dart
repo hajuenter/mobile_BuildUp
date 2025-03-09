@@ -16,30 +16,30 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  String errorMessage = '';
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final LoginController _loginController = LoginController();
   final LoginGoogleController _loginGoogleController = LoginGoogleController();
   bool _isLoading = false;
 
+  String? _emailError;
+  String? _passwordError;
+
   void _handleLogin() async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
-    // Validasi jika input kosong
-    if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Email dan Password tidak boleh kosong"),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return; // Hentikan proses login
-    }
+    setState(() {
+      _emailError = email.isEmpty ? "Email tidak boleh kosong" : null;
+      _passwordError = password.isEmpty ? "Password tidak boleh kosong" : null;
+    });
+
+    if (_emailError != null || _passwordError != null) return;
 
     setState(() => _isLoading = true);
 
-    await _loginController.login(email, password, context);
+    await _loginController.login(context, email, password);
 
     setState(() => _isLoading = false);
   }
@@ -88,11 +88,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 30),
-                        InputEmail(controller: _emailController),
+                        InputEmail(
+                          controller: _emailController,
+                          externalError: _emailError,
+                        ),
                         const SizedBox(height: 15),
                         InputPassword(
                           controller: _passwordController,
                           isLogin: true,
+                          externalError: _passwordError,
                         ),
                         const SizedBox(height: 10),
                         Align(
@@ -130,9 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: 50.0,
                           width: double.infinity,
                           child: ButtonPrimary(
-                            text: _isLoading
-                                ? ''
-                                : 'Masuk', // Kosongkan teks jika loading
+                            text: _isLoading ? '' : 'Masuk',
                             onPressed: _isLoading ? null : _handleLogin,
                             child: _isLoading
                                 ? const SizedBox(
@@ -140,8 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: Colors
-                                          .white, // Warna putih agar sesuai dengan tombol
+                                      color: Colors.white,
                                     ),
                                   )
                                 : null,
@@ -153,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             Expanded(
                               child: Divider(
-                                color: Colors.grey[300], // Garis abu-abu tipis
+                                color: Colors.grey[300],
                                 thickness: 1,
                                 endIndent: 10,
                               ),
@@ -175,30 +176,39 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        // Tombol Login dengan Google
-                        GestureDetector(
+                        InkWell(
                           onTap: _handleGoogleLogin,
+                          borderRadius: BorderRadius.circular(15),
                           child: Container(
                             height: 50,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(15),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 SvgPicture.asset(
                                   'assets/google.svg',
-                                  width: 32,
-                                  height: 32,
+                                  width: 28,
+                                  height: 28,
                                 ),
-                                const SizedBox(width: 10),
+                                const SizedBox(width: 12),
                                 const Text(
-                                  'Login Google',
+                                  'Sign in with Google',
                                   style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black87,
+                                  ),
                                 ),
                               ],
                             ),

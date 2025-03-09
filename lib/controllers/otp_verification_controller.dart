@@ -18,16 +18,18 @@ class OtpVerificationController {
 
     final response = await apiService.verifyOtp(email, otp);
 
-    if (response != null && response['success'] == true) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => ResetPasswordScreen(email: email),
-        ),
-      );
+    if (response.data != null && response.data!.success) {
+      if (context.mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => ResetPasswordScreen(email: email),
+          ),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(response?['error'] ?? 'OTP tidak valid'),
+          content: Text(response.error ?? 'OTP tidak valid'),
           backgroundColor: Colors.red,
         ),
       );

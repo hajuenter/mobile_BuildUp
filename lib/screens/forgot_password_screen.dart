@@ -15,13 +15,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
   final SendOtpController _sendOtpController = SendOtpController();
   bool _isLoading = false;
+  String? _emailError; // ✅ Tambahkan variabel untuk menyimpan error
 
   void _handleSendOtp() async {
+    String email = _emailController.text.trim();
+
+    // ✅ Validasi jika email kosong
+    if (email.isEmpty) {
+      setState(() {
+        _emailError = "Email tidak boleh kosong";
+      });
+      return;
+    }
+
+    // ✅ Hapus error jika sudah diisi
     setState(() {
+      _emailError = null;
       _isLoading = true;
     });
 
-    await _sendOtpController.sendOtp(context, _emailController.text);
+    await _sendOtpController.sendOtp(context, email);
 
     setState(() {
       _isLoading = false;
@@ -40,13 +53,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 40,
-        // bottom: PreferredSize(
-        //   preferredSize: const Size.fromHeight(1.0), // Tinggi border
-        //   child: Container(
-        //     color: Colors.grey, // Warna border
-        //     height: 1.0, // Ketebalan border
-        //   ),
-        // ),
       ),
       body: SafeArea(
         child: Padding(
@@ -79,15 +85,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 15),
-                        InputEmail(controller: _emailController),
+                        InputEmail(
+                          controller: _emailController,
+                          externalError: _emailError, // ✅ Kirim error ke input
+                        ),
                         const SizedBox(height: 15),
                         SizedBox(
                           height: 50.0,
                           width: double.infinity,
                           child: ButtonPrimary(
-                            text: _isLoading
-                                ? ''
-                                : 'Kirim OTP', // Kosongkan teks jika loading
+                            text: _isLoading ? '' : 'Kirim OTP',
                             onPressed: _isLoading ? null : _handleSendOtp,
                             child: _isLoading
                                 ? const SizedBox(
@@ -95,8 +102,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: Colors
-                                          .white, // Warna putih agar sesuai dengan tombol
+                                      color: Colors.white,
                                     ),
                                   )
                                 : null,

@@ -171,16 +171,22 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         SizedBox(
                           height: 50.0,
                           width: double.infinity,
-                          child: _isLoading
-                              ? const Center(
-                                  child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                )) // Tampilkan loading jika sedang proses
-                              : ButtonPrimary(
-                                  text: 'Simpan Password',
-                                  onPressed: _resetPassword,
-                                ),
+                          child: ButtonPrimary(
+                            text: _isLoading
+                                ? ''
+                                : 'Simpan Password', // Kosongkan teks saat loading
+                            onPressed: _isLoading ? null : _resetPassword,
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : null,
+                          ),
                         ),
                       ],
                     ),

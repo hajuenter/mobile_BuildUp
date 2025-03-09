@@ -34,40 +34,40 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    double screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Stack(
         children: [
-          Expanded(
-            flex: 3,
-            child: Center(
-              child: FadeTransition(
-                opacity: _animation,
-                child: SvgPicture.asset(
-                  'assets/logonew.svg',
-                  width: screenWidth * 0.4,
-                  height: screenHeight * 0.3,
-                  fit: BoxFit.contain,
-                ),
+          /// **Logo di tengah layar**
+          Center(
+            child: FadeTransition(
+              opacity: _animation,
+              child: SvgPicture.asset(
+                'assets/logonew.svg',
+                width: MediaQuery.of(context).size.width * 0.4,
+                height: MediaQuery.of(context).size.height * 0.3,
+                fit: BoxFit.contain,
               ),
             ),
           ),
-          Expanded(
+
+          /// **Teks copyright dengan ikon di bawah layar**
+          Positioned(
+            bottom: 20,
+            left: 0,
+            right: 0,
             child: FadeTransition(
               opacity: _animation,
-              child: Align(
-                alignment: Alignment.center,
-                child: Text(
-                  '@Copy Right by B2',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.copyright, size: 16, color: Colors.black54),
+                  const SizedBox(width: 5),
+                  const Text(
+                    "2025 B2. All Rights Reserved",
+                    style: TextStyle(fontSize: 12, color: Colors.black54),
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -82,7 +82,6 @@ class _SplashScreenState extends State<SplashScreen>
     super.dispose();
   }
 
-  // 🔹 Fungsi untuk transisi fade ke halaman berikutnya
   PageRouteBuilder _fadeTransition(Widget page) {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) => page,

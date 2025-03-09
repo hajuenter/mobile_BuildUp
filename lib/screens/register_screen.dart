@@ -74,11 +74,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (errorMessages == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Registrasi berhasil, silakan tunggu konfirmasi dari Admin!',
-            style: TextStyle(color: Colors.white), // Teks putih
-          ),
-          backgroundColor: Colors.green, // Latar belakang hijau
+          content:
+              Text('Registrasi berhasil, silakan tunggu konfirmasi Admin!'),
+          backgroundColor: Colors.green,
         ),
       );
       Navigator.of(context).pushReplacement(
@@ -96,12 +94,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
     } else {
       setState(() {
-        _errors = errorMessages.map((key, value) => MapEntry(key, value[0]));
+        _errors = errorMessages;
       });
     }
 
-    setState(
-        () => _isLoading = false); // 🔹 Matikan loading setelah proses selesai
+    setState(() => _isLoading = false);
   }
 
   @override

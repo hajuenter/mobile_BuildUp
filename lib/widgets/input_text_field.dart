@@ -38,7 +38,6 @@ class _InputTextFieldState extends State<InputTextField> {
   @override
   void didUpdateWidget(covariant InputTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // 🔹 Perbarui error jika externalError berubah
     if (widget.externalError != oldWidget.externalError) {
       setState(() {
         errorText = widget.externalError;
@@ -106,7 +105,6 @@ class _InputTextFieldState extends State<InputTextField> {
             ),
           ),
         ),
-        const SizedBox(height: 5),
       ],
     );
   }

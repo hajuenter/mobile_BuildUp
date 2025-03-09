@@ -15,12 +15,26 @@ class OtpVerificationScreen extends StatefulWidget {
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final TextEditingController _otpController = TextEditingController();
   final OtpVerificationController _controller = OtpVerificationController();
-  String _errorMessage = '';
+  bool _isLoading = false; // Tambahkan state loading
 
   @override
   void dispose() {
     _otpController.dispose();
     super.dispose();
+  }
+
+  Future<void> _verifyOtp() async {
+    setState(() {
+      _isLoading = true; // Aktifkan loading sebelum proses OTP
+    });
+
+    await _controller.verifyOtp(context, widget.email, _otpController.text);
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false; // Matikan loading setelah proses selesai
+      });
+    }
   }
 
   @override
@@ -72,24 +86,23 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         ),
                         const SizedBox(height: 20),
                         InputOtp(controller: _otpController),
-                        if (_errorMessage.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(
-                              _errorMessage,
-                              style: const TextStyle(color: Colors.red),
-                            ),
-                          ),
                         const SizedBox(height: 15),
                         SizedBox(
                           height: 50.0,
                           width: double.infinity,
                           child: ButtonPrimary(
-                            text: "Verifikasi OTP",
-                            onPressed: () {
-                              _controller.verifyOtp(
-                                  context, widget.email, _otpController.text);
-                            },
+                            text: _isLoading ? '' : 'Verifikasi OTP',
+                            onPressed: _isLoading ? null : _verifyOtp,
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : null,
                           ),
                         ),
                       ],
