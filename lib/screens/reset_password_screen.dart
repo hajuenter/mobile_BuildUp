@@ -115,6 +115,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
           color: Colors.black,
         ),
         elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 40,
       ),
       body: SafeArea(
         child: Padding(
@@ -164,7 +166,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           controller: _confirmPasswordController,
                           passwordController: _passwordController,
                         ),
-                        const SizedBox(height: 35),
+                        const SizedBox(height: 15),
                         // Tombol Simpan Password
                         SizedBox(
                           height: 50.0,

@@ -37,6 +37,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           color: Colors.black,
         ),
         elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 40,
       ),
       body: SafeArea(
         child: Padding(
@@ -78,7 +80,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                               style: const TextStyle(color: Colors.red),
                             ),
                           ),
-                        const SizedBox(height: 30),
+                        const SizedBox(height: 15),
                         SizedBox(
                           height: 50.0,
                           width: double.infinity,

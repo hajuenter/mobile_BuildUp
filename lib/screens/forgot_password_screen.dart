@@ -38,6 +38,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
         titleTextStyle: const TextStyle(color: Colors.black),
         elevation: 0,
+        scrolledUnderElevation: 0,
+        toolbarHeight: 40,
+        // bottom: PreferredSize(
+        //   preferredSize: const Size.fromHeight(1.0), // Tinggi border
+        //   child: Container(
+        //     color: Colors.grey, // Warna border
+        //     height: 1.0, // Ketebalan border
+        //   ),
+        // ),
       ),
       body: SafeArea(
         child: Padding(
@@ -71,7 +80,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         const SizedBox(height: 15),
                         InputEmail(controller: _emailController),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 15),
                         SizedBox(
                           height: 50.0,
                           width: double.infinity,

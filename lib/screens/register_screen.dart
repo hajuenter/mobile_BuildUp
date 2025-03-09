@@ -174,7 +174,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             passwordController: _passwordController,
                             externalError: _errors["confirmPassword"],
                           ),
-                          const SizedBox(height: 35),
+                          const SizedBox(height: 25),
 
                           // 🔹 Tombol Daftar dengan Loading
                           SizedBox(
@@ -195,7 +195,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   : null,
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
 
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -230,6 +230,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ],
                           ),
+                          const SizedBox(
+                            height: 5,
+                          )
                         ],
                       ),
                     ),

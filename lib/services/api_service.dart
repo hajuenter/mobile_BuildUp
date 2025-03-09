@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://127.0.0.1:8000/api';
+  static const String baseUrl = 'http://192.168.142.97:8000/api';
   // Ganti dengan IP yang sesuai dengan jaringan lokal backend Laravel
 
   Future<Map<String, dynamic>?> registerUser(
@@ -37,6 +37,29 @@ class ApiService {
         return responseData;
       } else {
         return {"error": responseData['message'] ?? "Login gagal"};
+      }
+    } catch (e) {
+      print("Error: $e");
+      return {"error": "Terjadi kesalahan, coba lagi"};
+    }
+  }
+
+  Future<Map<String, dynamic>?> loginWithGoogle(String email) async {
+    final String url = '$baseUrl/google-login';
+
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email}),
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return responseData;
+      } else {
+        return {"error": responseData['message'] ?? "Login Google gagal"};
       }
     } catch (e) {
       print("Error: $e");

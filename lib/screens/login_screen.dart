@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 import '../controllers/login_controller.dart';
+import '../controllers/login_google_controller.dart';
 import '../widgets/input_email.dart';
 import '../widgets/input_password.dart';
 import '../widgets/button_primary.dart';
@@ -18,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final LoginController _loginController = LoginController();
+  final LoginGoogleController _loginGoogleController = LoginGoogleController();
   bool _isLoading = false;
 
   void _handleLogin() async {
@@ -40,6 +42,10 @@ class _LoginScreenState extends State<LoginScreen> {
     await _loginController.login(email, password, context);
 
     setState(() => _isLoading = false);
+  }
+
+  void _handleGoogleLogin() async {
+    await _loginGoogleController.loginWithGoogle(context);
   }
 
   @override
@@ -119,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 35),
+                        const SizedBox(height: 25),
                         SizedBox(
                           height: 50.0,
                           width: double.infinity,
@@ -141,7 +147,64 @@ class _LoginScreenState extends State<LoginScreen> {
                                 : null,
                           ),
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey[300], // Garis abu-abu tipis
+                                thickness: 1,
+                                endIndent: 10,
+                              ),
+                            ),
+                            const Text(
+                              'atau',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey[300],
+                                thickness: 1,
+                                indent: 10,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        // Tombol Login dengan Google
+                        GestureDetector(
+                          onTap: _handleGoogleLogin,
+                          child: Container(
+                            height: 50,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/google.svg',
+                                  width: 32,
+                                  height: 32,
+                                ),
+                                const SizedBox(width: 10),
+                                const Text(
+                                  'Login Google',
+                                  style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
                         GestureDetector(
                           onTap: () {
                             Navigator.of(context).push(
