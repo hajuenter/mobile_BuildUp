@@ -6,7 +6,7 @@ import '../responses/otp_verification_response.dart';
 import '../responses/register_response.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.142.97:8000/api';
+  static const String baseUrl = 'http://192.168.35.97:8000/api';
   // Ganti dengan IP yang sesuai dengan jaringan lokal backend Laravel
 
   Future<RegisterResponse?> registerUser(Map<String, dynamic> userData) async {

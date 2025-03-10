@@ -1,24 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-class InputOtp extends StatelessWidget {
+class InputOtp extends StatefulWidget {
   final TextEditingController controller;
+  final String? externalError; // ✅ Error dari luar
 
-  const InputOtp({super.key, required this.controller});
+  const InputOtp({Key? key, required this.controller, this.externalError})
+      : super(key: key);
+
+  @override
+  _InputOtpState createState() => _InputOtpState();
+}
+
+class _InputOtpState extends State<InputOtp> {
+  String? errorText;
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      if (!_focusNode.hasFocus && widget.controller.text.isEmpty) {
+        setState(() {
+          errorText = "Kode OTP tidak boleh kosong";
+        });
+      }
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant InputOtp oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // ✅ Jika `externalError` berubah, update errorText
+    if (widget.externalError != oldWidget.externalError) {
+      setState(() {
+        errorText = widget.externalError;
+      });
+    }
+  }
+
+  void _validateInput(String value) {
+    setState(() {
+      errorText = value.isEmpty ? "Kode OTP tidak boleh kosong" : null;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      keyboardType: TextInputType.number,
-      inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.digitsOnly, // Hanya menerima angka
-        LengthLimitingTextInputFormatter(
-            4), // Batasi panjang input menjadi 4 digit
-      ],
       cursorColor: Colors.black,
+      controller: widget.controller,
+      focusNode: _focusNode,
+      keyboardType: TextInputType.number,
+      maxLength: 4,
+      textAlign: TextAlign.center,
+      onChanged: _validateInput, // ✅ Error hilang saat mulai mengetik
       decoration: InputDecoration(
-        labelText: 'OTP',
+        labelText: 'Kode OTP',
         labelStyle: TextStyle(
           color: Colors.grey[700],
           fontWeight: FontWeight.w600,
@@ -43,7 +80,16 @@ class InputOtp extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: Colors.black, width: 2),
         ),
-        prefixIcon: const Icon(Icons.security, color: Colors.grey),
+        errorText: errorText, // ✅ Gunakan error dari internal & external
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
+        ),
+        counterText: "",
       ),
     );
   }

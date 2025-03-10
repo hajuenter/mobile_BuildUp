@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/api_service.dart';
+import '../controllers/reset_password_controller.dart';
+import '../responses/reset_password_response.dart';
 import '../widgets/input_password.dart';
 import '../widgets/button_primary.dart';
 import 'login_screen.dart';
@@ -7,7 +8,7 @@ import '../widgets/input_konfir_password.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  final String email; // Tambahkan email sebagai parameter
+  final String email;
 
   const ResetPasswordScreen({super.key, required this.email});
 
@@ -19,8 +20,11 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-  final ApiService _apiService = ApiService();
-  bool _isLoading = false; // Untuk menunjukkan status loading
+  final ResetPasswordController _resetPasswordController =
+      ResetPasswordController();
+  bool _isLoading = false;
+  String? passwordError;
+  String? confirmPasswordError;
 
   @override
   void dispose() {
@@ -30,74 +34,66 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   }
 
   void _resetPassword() async {
-    String password = _passwordController.text;
-    String confirmPassword = _confirmPasswordController.text;
-
-    if (password.isEmpty || confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Password tidak boleh kosong'),
-            backgroundColor: Colors.red),
-      );
-      return;
-    }
-
-    if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Konfirmasi password tidak cocok'),
-            backgroundColor: Colors.red),
-      );
-      return;
-    }
-
     setState(() {
-      _isLoading = true;
+      passwordError =
+          _passwordController.text.isEmpty ? "Password wajib diisi." : null;
+      confirmPasswordError = _confirmPasswordController.text.isEmpty
+          ? "Konfirmasi password wajib diisi."
+          : null;
     });
 
-    final response = await _apiService.resetPassword(
-      widget.email,
-      password,
-      confirmPassword,
+    if (passwordError != null || confirmPasswordError != null) {
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    ResetPasswordResponse response =
+        await _resetPasswordController.resetPassword(
+      email: widget.email,
+      password: _passwordController.text,
+      confirmPassword: _confirmPasswordController.text,
     );
 
-    setState(() {
-      _isLoading = false;
-    });
+    setState(() => _isLoading = false);
 
-    if (response != null && response['success'] == true) {
+    if (response.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text(
-              'Password berhasil diubah!',
-              style: TextStyle(color: Colors.white), // Teks putih
-            ),
+            content: Text("Password berhasil diubah!"),
             backgroundColor: Colors.green),
       );
 
-      // Kembali ke halaman login setelah reset password sukses
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginScreen()),
-        (route) => false, // Hapus semua halaman sebelumnya
-      );
-    } else if (response != null && response['errors'] != null) {
-      String errorMessage =
-          response['errors'].values.first[0]; // Ambil error pertama
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(errorMessage, style: TextStyle(color: Colors.white)),
-            backgroundColor: Colors.red),
+        (route) => false,
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-              'Gagal mengubah password',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.red),
-      );
+      setState(() {
+        passwordError = null;
+        confirmPasswordError = null;
+
+        if (response.error == "Password wajib diisi.") {
+          passwordError = response.error;
+        } else if (response.error == "Minimal panjang password 8 karakter") {
+          passwordError = response.error;
+        } else if (response.error == "Password tidak valid") {
+          passwordError = response.error;
+        } else if (response.error == "Password harus mengandung simbol") {
+          passwordError = response.error;
+        } else if (response.error == "Konfirmasi password wajib diisi.") {
+          confirmPasswordError = response.error;
+        } else if (response.error == "Konfirmasi password tidak cocok.") {
+          confirmPasswordError = response.error;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(response.error ?? "Gagal mengubah password"),
+                backgroundColor: Colors.red),
+          );
+        }
+      });
     }
   }
 
@@ -108,12 +104,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       appBar: AppBar(
         title: const Text("Reset Password"),
         backgroundColor: Colors.white,
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
-        titleTextStyle: const TextStyle(
-          color: Colors.black,
-        ),
+        iconTheme: const IconThemeData(color: Colors.black),
+        titleTextStyle: const TextStyle(color: Colors.black),
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 40,
@@ -154,36 +146,39 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 30),
+
                         // Input Password Baru
                         InputPassword(
                           controller: _passwordController,
                           showValidation: false,
                           isLogin: false,
+                          externalError:
+                              passwordError, // 🔥 Menampilkan error jika ada
                         ),
                         const SizedBox(height: 15),
+
                         // Input Konfirmasi Password
                         InputKonfirPassword(
                           controller: _confirmPasswordController,
                           passwordController: _passwordController,
+                          externalError:
+                              confirmPasswordError, // 🔥 Menampilkan error jika ada
                         ),
                         const SizedBox(height: 15),
+
                         // Tombol Simpan Password
                         SizedBox(
                           height: 50.0,
                           width: double.infinity,
                           child: ButtonPrimary(
-                            text: _isLoading
-                                ? ''
-                                : 'Simpan Password', // Kosongkan teks saat loading
+                            text: _isLoading ? '' : 'Simpan Password',
                             onPressed: _isLoading ? null : _resetPassword,
                             child: _isLoading
                                 ? const SizedBox(
                                     width: 20,
                                     height: 20,
                                     child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.white,
-                                    ),
+                                        strokeWidth: 2, color: Colors.white),
                                   )
                                 : null,
                           ),
