@@ -14,10 +14,10 @@ class InputKonfirPassword extends StatefulWidget {
   });
 
   @override
-  _InputKonfirPasswordState createState() => _InputKonfirPasswordState();
+  InputKonfirPasswordState createState() => InputKonfirPasswordState();
 }
 
-class _InputKonfirPasswordState extends State<InputKonfirPassword> {
+class InputKonfirPasswordState extends State<InputKonfirPassword> {
   bool _isPasswordVisible = false;
   String? errorText;
   final FocusNode _focusNode = FocusNode();

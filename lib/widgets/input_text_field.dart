@@ -16,10 +16,10 @@ class InputTextField extends StatefulWidget {
   });
 
   @override
-  _InputTextFieldState createState() => _InputTextFieldState();
+  InputTextFieldState createState() => InputTextFieldState();
 }
 
-class _InputTextFieldState extends State<InputTextField> {
+class InputTextFieldState extends State<InputTextField> {
   String? errorText;
   final FocusNode _focusNode = FocusNode();
 

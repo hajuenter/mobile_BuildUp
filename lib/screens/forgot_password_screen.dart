@@ -8,19 +8,18 @@ class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
+  ForgotPasswordScreenState createState() => ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
   final SendOtpController _sendOtpController = SendOtpController();
   bool _isLoading = false;
-  String? _emailError; // ✅ Tambahkan variabel untuk menyimpan error
+  String? _emailError;
 
   void _handleSendOtp() async {
     String email = _emailController.text.trim();
 
-    // ✅ Validasi jika email kosong
     if (email.isEmpty) {
       setState(() {
         _emailError = "Email tidak boleh kosong";
@@ -28,17 +27,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
 
-    // ✅ Hapus error jika sudah diisi
     setState(() {
       _emailError = null;
       _isLoading = true;
     });
 
-    await _sendOtpController.sendOtp(context, email);
+    String? errorMessage = await _sendOtpController.sendOtp(context, email);
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (errorMessage != null) {
+      setState(() {
+        _emailError = errorMessage;
+      });
+    }
+
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -87,7 +89,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         const SizedBox(height: 15),
                         InputEmail(
                           controller: _emailController,
-                          externalError: _emailError, // ✅ Kirim error ke input
+                          externalError: _emailError,
                         ),
                         const SizedBox(height: 15),
                         SizedBox(

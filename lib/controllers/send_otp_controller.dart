@@ -6,10 +6,11 @@ import '../screens/otp_verification_screen.dart';
 class SendOtpController {
   final ApiService _apiService = ApiService();
 
-  Future<void> sendOtp(BuildContext context, String email) async {
+  Future<String?> sendOtp(BuildContext context, String email) async {
     final responseData = await _apiService.sendOtp(email);
 
-    // ✅ Pastikan response tidak null sebelum parsing
+    if (!context.mounted) return null; // Cek apakah widget masih ada
+
     if (responseData != null) {
       final response = SendOtpResponse.fromJson(responseData);
 
@@ -19,21 +20,12 @@ class SendOtpController {
             builder: (context) => OtpVerificationScreen(email: email),
           ),
         );
+        return null; // Tidak ada error
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(response.message),
-            backgroundColor: Colors.red,
-          ),
-        );
+        return response.message; // Mengembalikan pesan error dari API
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Terjadi kesalahan, coba lagi."),
-          backgroundColor: Colors.red,
-        ),
-      );
+      return "Email tidak terdaftar.";
     }
   }
 }

@@ -1,5 +1,6 @@
 import '../responses/reset_password_response.dart';
 import '../services/api_service.dart';
+import '../services/session_manager.dart';
 
 class ResetPasswordController {
   final ApiService _apiService = ApiService();
@@ -33,6 +34,7 @@ class ResetPasswordController {
         await _apiService.resetPassword(email, password, confirmPassword);
 
     if (response != null && response['success'] == true) {
+      await SessionManager.clearSession();
       return ResetPasswordResponse(
           success: true, message: "Password berhasil diperbarui!");
     } else if (response != null && response['errors'] != null) {

@@ -4,14 +4,13 @@ class InputOtp extends StatefulWidget {
   final TextEditingController controller;
   final String? externalError; // ✅ Error dari luar
 
-  const InputOtp({Key? key, required this.controller, this.externalError})
-      : super(key: key);
+  const InputOtp({super.key, required this.controller, this.externalError});
 
   @override
-  _InputOtpState createState() => _InputOtpState();
+  InputOtpState createState() => InputOtpState();
 }
 
-class _InputOtpState extends State<InputOtp> {
+class InputOtpState extends State<InputOtp> {
   String? errorText;
   final FocusNode _focusNode = FocusNode();
 

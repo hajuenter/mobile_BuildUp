@@ -1,83 +1,140 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:convert';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/api_service.dart';
+import '../models/user.dart';
 import '../screens/home_screen.dart';
+import '../screens/login_screen.dart'; // Tambahkan halaman login untuk redirect jika sesi habis
 
 class LoginGoogleController {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final ApiService _apiService = ApiService();
+  static const int sessionDuration = 7200000; // 2 jam dalam milidetik
 
   Future<void> loginWithGoogle(BuildContext context) async {
     try {
-      // Sign out dulu hanya jika user ingin mengganti akun
+      // 🔹 Jika user sebelumnya sudah login, logout terlebih dahulu
       if (_auth.currentUser != null) {
         await _googleSignIn.signOut();
         await _auth.signOut();
       }
 
+      // 🔹 Login dengan Google
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        return; // Jika user membatalkan login
-      }
+      if (googleUser == null) return; // Jika user membatalkan login
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
 
-      final AuthCredential credential = GoogleAuthProvider.credential(
+      final firebase_auth.AuthCredential credential =
+          firebase_auth.GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential =
+      final firebase_auth.UserCredential userCredential =
           await _auth.signInWithCredential(credential);
-      final User? user = userCredential.user;
+      final firebase_auth.User? user = userCredential.user;
 
       if (user != null) {
         final String? email = user.email;
-
         if (email == null || email.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Email tidak ditemukan pada akun Google"),
-              backgroundColor: Colors.red,
-            ),
-          );
+          if (context.mounted) {
+            _showErrorMessage(
+                context, "Email tidak ditemukan pada akun Google");
+          }
           return;
         }
 
-        // Kirim email ke backend untuk verifikasi
+        // 🔹 Kirim email ke backend untuk verifikasi
         final response = await _apiService.loginWithGoogle(email);
 
-        if (response != null && response['success'] == true) {
-          // 🔹 Simpan token ke SharedPreferences
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString("token", response["token"]);
+        if (response['success'] == true) {
+          // 🔹 Parsing user dari response
+          User userData = User.fromJson(response['user']);
 
-          // 🔹 Navigasi ke HomeScreen
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-          );
+          // 🔹 Simpan API Key & user di SharedPreferences
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString("api_key", userData.apiKey);
+          await prefs.setString("user", jsonEncode(response["user"]));
+          await prefs.setInt("lastLoginTime",
+              DateTime.now().millisecondsSinceEpoch); // Simpan waktu login
+
+          // 🔹 Navigasi ke HomeScreen dengan data user
+          if (context.mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => HomeScreen(user: userData)),
+            );
+          }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(response?['message'] ?? "Login gagal"),
-              backgroundColor: Colors.red,
-            ),
-          );
+          if (context.mounted) {
+            _showErrorMessage(context, response['message'] ?? "Login gagal");
+          }
         }
       }
     } catch (e) {
-      print("Error login Google: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Terjadi kesalahan, coba lagi."),
-          backgroundColor: Colors.red,
-        ),
+      debugPrint("Error login Google: $e");
+      if (context.mounted) {
+        _showErrorMessage(context, "Terjadi kesalahan, coba lagi.");
+      }
+    }
+  }
+
+  // 🔹 Fungsi untuk mengecek apakah sesi masih berlaku
+  Future<void> checkSession(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final int? lastLoginTime = prefs.getInt("lastLoginTime");
+    final String? apiKey = prefs.getString("api_key"); // 🔥 Ambil API Key
+
+    if (lastLoginTime != null && apiKey != null && apiKey.isNotEmpty) {
+      final int now = DateTime.now().millisecondsSinceEpoch;
+      final bool isSessionValid = (now - lastLoginTime) < sessionDuration;
+
+      if (isSessionValid) {
+        // 🔹 Ambil data user dari SharedPreferences
+        final String? userJson = prefs.getString("user");
+        if (userJson != null) {
+          User userData = User.fromJson(jsonDecode(userJson));
+
+          // 🔹 Jika sesi masih berlaku, langsung ke HomeScreen
+          if (context.mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => HomeScreen(user: userData)),
+            );
+          }
+          return;
+        }
+      }
+    }
+
+    // 🔹 Jika sesi habis, hapus API Key & redirect ke LoginScreen
+    await prefs.remove("api_key");
+    await prefs.remove("user");
+    await prefs.remove("lastLoginTime");
+
+    if (context.mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => LoginScreen()), // Redirect ke login
       );
     }
+  }
+
+  // 🔹 Fungsi untuk menampilkan pesan error
+  void _showErrorMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
 }

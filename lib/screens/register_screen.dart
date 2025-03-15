@@ -12,10 +12,10 @@ class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  RegisterScreenState createState() => RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -26,42 +26,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Map<String, String> _errors = {};
   bool _isLoading = false; // 🔹 State untuk loading
 
-  bool _validateInputs() {
-    setState(() {
-      _errors.clear();
-
-      if (_nameController.text.isEmpty) {
-        _errors["name"] = "Nama tidak boleh kosong";
-      } else if (_nameController.text.length < 5) {
-        _errors["name"] = "Nama harus memiliki minimal 5 huruf.";
-      }
-
-      if (_emailController.text.isEmpty) {
-        _errors["email"] = "Email tidak boleh kosong";
-      } else if (!RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
-          .hasMatch(_emailController.text)) {
-        _errors["email"] = "Format email tidak valid";
-      }
-
-      if (_passwordController.text.isEmpty) {
-        _errors["password"] = "Password tidak boleh kosong";
-      }
-
-      if (_confirmPasswordController.text.isEmpty) {
-        _errors["confirmPassword"] = "Konfirmasi password tidak boleh kosong";
-      } else if (_confirmPasswordController.text != _passwordController.text) {
-        _errors["confirmPassword"] = "Konfirmasi password tidak cocok";
-      }
-    });
-
-    return _errors.isEmpty; // Jika tidak ada error, berarti valid
-  }
-
   void _handleRegister() async {
-    if (!_validateInputs()) return;
-
     setState(() {
       _isLoading = true;
+      _errors.clear();
     });
 
     final errorMessages = await _registerController.registerUser(
@@ -72,6 +40,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
 
     if (errorMessages == null) {
+      if (!mounted) return; // Cek apakah widget masih ada
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content:
@@ -79,6 +49,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           backgroundColor: Colors.green,
         ),
       );
+
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
           transitionDuration: const Duration(milliseconds: 300),

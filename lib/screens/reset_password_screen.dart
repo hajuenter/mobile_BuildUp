@@ -13,10 +13,10 @@ class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key, required this.email});
 
   @override
-  _ResetPasswordScreenState createState() => _ResetPasswordScreenState();
+  ResetPasswordScreenState createState() => ResetPasswordScreenState();
 }
 
-class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+class ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
@@ -58,10 +58,13 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     setState(() => _isLoading = false);
 
     if (response.success) {
+      if (!mounted) return; // Pastikan widget masih ada sebelum akses context
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Password berhasil diubah!"),
-            backgroundColor: Colors.green),
+          content: Text("Password berhasil diubah!"),
+          backgroundColor: Colors.green,
+        ),
       );
 
       Navigator.pushAndRemoveUntil(

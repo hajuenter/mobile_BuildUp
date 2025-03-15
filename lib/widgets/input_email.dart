@@ -12,10 +12,10 @@ class InputEmail extends StatefulWidget {
   });
 
   @override
-  _InputEmailState createState() => _InputEmailState();
+  InputEmailState createState() => InputEmailState();
 }
 
-class _InputEmailState extends State<InputEmail> {
+class InputEmailState extends State<InputEmail> {
   String? errorText;
   final FocusNode _focusNode = FocusNode();
 

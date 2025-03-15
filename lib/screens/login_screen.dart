@@ -12,10 +12,10 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  LoginScreenState createState() => LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends State<LoginScreen> {
   String errorMessage = '';
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -187,9 +187,13 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(15),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 3),
+                                  color: Colors.black.withAlpha(25),
+                                  blurRadius:
+                                      4, // Kurangi agar tidak terlalu tebal
+                                  spreadRadius:
+                                      1, // Tambahkan sedikit untuk efek lembut
+                                  offset: const Offset(
+                                      0, 2), // Kurangi pergeseran bayangan
                                 ),
                               ],
                             ),

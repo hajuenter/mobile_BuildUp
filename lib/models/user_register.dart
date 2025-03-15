@@ -2,13 +2,13 @@ class UserRegister {
   final int id;
   final String name;
   final String email;
-  final String role;
+  final String? apiKey; // Tambahkan API Key
 
   UserRegister({
     required this.id,
     required this.name,
     required this.email,
-    required this.role,
+    this.apiKey,
   });
 
   factory UserRegister.fromJson(Map<String, dynamic> json) {
@@ -16,7 +16,7 @@ class UserRegister {
       id: json['id'],
       name: json['name'],
       email: json['email'],
-      role: json['role'] ?? 'user', // Default role user
+      apiKey: json['api_key'], // Pastikan ini sesuai dengan API response
     );
   }
 
@@ -25,7 +25,7 @@ class UserRegister {
       'id': id,
       'name': name,
       'email': email,
-      'role': role,
+      'api_key': apiKey,
     };
   }
 }

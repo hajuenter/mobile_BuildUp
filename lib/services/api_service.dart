@@ -1,126 +1,166 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../responses/login_response.dart';
 import '../responses/otp_verification_response.dart';
 import '../responses/register_response.dart';
+import 'package:flutter/foundation.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.35.97:8000/api';
-  // Ganti dengan IP yang sesuai dengan jaringan lokal backend Laravel
+  static const String baseUrl = 'http://192.168.172.97:8000/api';
+  final Dio _dio = Dio();
 
-  Future<RegisterResponse?> registerUser(Map<String, dynamic> userData) async {
-    final String url = '$baseUrl/register';
+  ApiService() {
+    _dio.options = BaseOptions(
+      baseUrl: baseUrl,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+      headers: {"Content-Type": "application/json"},
+    );
 
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(userData),
-      );
-
-      if (response.statusCode == 201 || response.statusCode == 422) {
-        return RegisterResponse.fromJson(jsonDecode(response.body));
-      }
-    } catch (e) {
-      print("Error: $e");
-    }
-    return null;
+    _dio.interceptors.add(InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final apiKey = await _getApiKey();
+        if (apiKey != null) {
+          options.headers["Authorization"] = "Bearer $apiKey";
+        }
+        return handler.next(options);
+      },
+      onError: (DioException e, handler) {
+        // print("Dio Error: ${e.response?.data ?? e.message}");
+        return handler.next(e);
+      },
+    ));
   }
 
-  Future<LoginResponse?> loginUser(String email, String password) async {
-    final String url = '$baseUrl/login';
+  Dio get dio => _dio;
 
+  Future<String?> _getApiKey() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString("api_key");
+  }
+
+  Future<void> _saveApiKey(String apiKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString("api_key", apiKey);
+  }
+
+  Future<RegisterResponse?> registerUser(Map<String, dynamic> userData) async {
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "password": password}),
-      );
+      final response = await _dio.post('/register', data: userData);
+      RegisterResponse registerResponse =
+          RegisterResponse.fromJson(response.data);
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        LoginResponse loginResponse = LoginResponse.fromJson(responseData);
-
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("token", loginResponse.token);
-
-        return loginResponse;
-      } else {
-        return null;
+      if (registerResponse.user?.apiKey != null) {
+        await _saveApiKey(registerResponse.user!.apiKey!);
       }
-    } catch (e) {
-      print("Error: $e");
+
+      return registerResponse;
+    } on DioException catch (e) {
+      debugPrint("Register Error: ${e.response?.data ?? e.message}");
       return null;
     }
   }
 
-  Future<Map<String, dynamic>?> loginWithGoogle(String email) async {
-    final String url = '$baseUrl/google-login';
-
+  Future<Map<String, dynamic>> loginUser(String email, String password) async {
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email}),
-      );
+      final response = await _dio
+          .post('/login', data: {"email": email, "password": password});
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
+        LoginResponse loginResponse = LoginResponse.fromJson(response.data);
 
-        // Simpan token ke SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString("token", responseData["token"]);
+        if (loginResponse.user.apiKey.isNotEmpty) {
+          await _saveApiKey(loginResponse.user.apiKey);
+        }
 
-        return responseData;
-      } else {
-        final responseData = jsonDecode(response.body);
-        return {"error": responseData['message'] ?? "Login Google gagal"};
+        return {
+          "success": true,
+          "message": "Login berhasil",
+          "data": loginResponse
+        };
       }
-    } catch (e) {
-      print("Error: $e");
-      return {"error": "Terjadi kesalahan, coba lagi"};
+    } on DioException catch (e) {
+      // Tangani error berdasarkan status kode
+      if (e.response?.statusCode == 401) {
+        return {"success": false, "message": "Email atau password salah"};
+      } else if (e.response?.statusCode == 403) {
+        return {
+          "success": false,
+          "message": e.response?.data["message"] ?? "Akses ditolak"
+        };
+      }
+
+      // Jika error lain
+      return {"success": false, "message": "Terjadi kesalahan saat login"};
     }
+
+    return {"success": false, "message": "Login gagal"};
+  }
+
+  Future<Map<String, dynamic>> loginWithGoogle(String email) async {
+    try {
+      final response = await _dio.post('/google-login', data: {"email": email});
+
+      if (response.statusCode == 200 && response.data.containsKey("api_key")) {
+        await _saveApiKey(response.data["api_key"]);
+        return {
+          "success": true,
+          "api_key": response.data["api_key"],
+          "user": response.data["user"]
+        };
+      }
+    } on DioException catch (e) {
+      // Pastikan menangani error 401 dengan benar
+      if (e.response?.statusCode == 401) {
+        return {
+          "success": false,
+          "message": e.response?.data["message"] ??
+              "Email tidak terdaftar atau belum diverifikasi"
+        };
+      }
+
+      // Jika error lain, tampilkan pesan default
+      return {
+        "success": false,
+        "message": "Terjadi kesalahan saat login dengan Google"
+      };
+    }
+    return {"success": false, "message": "Akun anda tidak terdaftar"};
   }
 
   Future<Map<String, dynamic>?> sendOtp(String email) async {
-    final String url = '$baseUrl/send-otp';
-
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email}),
-      );
+      final response = await _dio.post('/send-otp', data: {"email": email});
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint("Send OTP Error: ${e.response?.data ?? e.message}");
 
-      final responseData = jsonDecode(response.body);
-
-      if (response.statusCode == 200) {
-        return responseData;
-      } else if (response.statusCode == 422) {
-        // Jika ada error validasi dari backend (misalnya email tidak valid)
-        return {"error": responseData['message'] ?? "Format email salah"};
-      } else {
-        return {"error": responseData['message'] ?? "Gagal mengirim OTP"};
+      // Ambil pesan error dari API jika tersedia
+      if (e.response != null && e.response?.data is Map<String, dynamic>) {
+        return e.response?.data; // Langsung return error dari API
       }
-    } catch (e) {
-      print("Error: $e");
-      return {"error": "Terjadi kesalahan, coba lagi"};
+
+      return {"success": false, "message": "Terjadi kesalahan, coba lagi"};
     }
   }
 
   Future<OtpVerificationResponse> verifyOtp(String email, String otp) async {
-    final String url = '$baseUrl/verif-otp';
-
     try {
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({"email": email, "otp": otp}),
-      );
+      final response =
+          await _dio.post('/verif-otp', data: {"email": email, "otp": otp});
+      return OtpVerificationResponse.fromResponse(jsonEncode(response.data));
+    } on DioException catch (e) {
+      debugPrint("OTP Verification Error: ${e.response?.data ?? e.message}");
 
-      return OtpVerificationResponse.fromResponse(response.body);
-    } catch (e) {
+      // Ambil pesan error dari API jika tersedia
+      if (e.response != null && e.response?.data is Map<String, dynamic>) {
+        final errorMessage =
+            e.response?.data["message"] ?? "Terjadi kesalahan, coba lagi";
+        return OtpVerificationResponse(error: errorMessage);
+      }
+
+      // Jika tidak ada pesan error dari API, gunakan pesan default
       return OtpVerificationResponse(error: "Terjadi kesalahan, coba lagi");
     }
   }
@@ -128,27 +168,30 @@ class ApiService {
   Future<Map<String, dynamic>?> resetPassword(
       String email, String password, String confirmPassword) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/reset-password'),
-        body: {
-          'email': email,
-          'password': password,
-          'password_confirmation': confirmPassword,
-        },
-      );
-
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Body: ${response.body}");
-
-      if (response.statusCode == 200 || response.statusCode == 422) {
-        return jsonDecode(response.body);
-      } else {
-        print("Error: Tidak dapat mengubah password.");
-        return null;
-      }
-    } catch (e) {
-      print("Exception: $e");
-      return null;
+      final response = await _dio.post('/reset-password', data: {
+        'email': email,
+        'password': password,
+        'password_confirmation': confirmPassword,
+      });
+      return response.data;
+    } on DioException catch (e) {
+      debugPrint("Reset Password Error: ${e.response?.data ?? e.message}");
+      return {"error": "Terjadi kesalahan, coba lagi"};
     }
+  }
+
+  Future<bool> isApiAlive() async {
+    try {
+      final response = await dio.get('/status');
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+    debugPrint("Logout berhasil, API Key dihapus.");
   }
 }

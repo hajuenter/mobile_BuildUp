@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import 'login_screen.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../services/api_service.dart';
+import '../services/session_manager.dart';
+import '../models/user.dart';
+import 'home_screen.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  SplashScreenState createState() => SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -26,10 +29,56 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    Future.delayed(const Duration(seconds: 8), () {
-      Navigator.of(context)
-          .pushReplacement(_fadeTransition(const LoginScreen()));
-    });
+    _startApp();
+  }
+
+  Future<void> _startApp() async {
+    await Future.delayed(const Duration(seconds: 3));
+
+    const int maxRetries = 3;
+    int attempt = 0;
+
+    while (attempt < maxRetries) {
+      bool apiConnected = await ApiService().isApiAlive();
+      if (apiConnected) {
+        final User? user = await SessionManager.getUser();
+        final String? token = await SessionManager.getApiKey();
+        final int? lastLoginTime = await SessionManager.getLastLoginTime();
+
+        if (user != null && token != null && lastLoginTime != null) {
+          final int currentTime = DateTime.now().millisecondsSinceEpoch;
+          const int twoHours = 2 * 60 * 60 * 1000;
+
+          if ((currentTime - lastLoginTime) < twoHours) {
+            _navigateTo(HomeScreen(user: user));
+          } else {
+            await SessionManager.clearSession();
+            _navigateTo(const LoginScreen());
+          }
+        } else {
+          _navigateTo(const LoginScreen());
+        }
+        return;
+      } else {
+        attempt++;
+        await Future.delayed(const Duration(seconds: 3));
+      }
+    }
+  }
+
+  void _navigateTo(Widget page) {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => page,
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: child,
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 600),
+      ),
+    );
   }
 
   @override
@@ -38,7 +87,6 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          /// **Logo di tengah layar**
           Center(
             child: FadeTransition(
               opacity: _animation,
@@ -50,8 +98,6 @@ class _SplashScreenState extends State<SplashScreen>
               ),
             ),
           ),
-
-          /// **Teks copyright dengan ikon di bawah layar**
           Positioned(
             bottom: 20,
             left: 0,
@@ -60,10 +106,10 @@ class _SplashScreenState extends State<SplashScreen>
               opacity: _animation,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.copyright, size: 16, color: Colors.black54),
-                  const SizedBox(width: 5),
-                  const Text(
+                children: const [
+                  Icon(Icons.copyright, size: 16, color: Colors.black54),
+                  SizedBox(width: 5),
+                  Text(
                     "2025 B2. All Rights Reserved",
                     style: TextStyle(fontSize: 12, color: Colors.black54),
                   ),
@@ -80,18 +126,5 @@ class _SplashScreenState extends State<SplashScreen>
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  PageRouteBuilder _fadeTransition(Widget page) {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => page,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
-      },
-      transitionDuration: const Duration(milliseconds: 600),
-    );
   }
 }

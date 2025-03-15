@@ -10,10 +10,10 @@ class OtpVerificationScreen extends StatefulWidget {
   const OtpVerificationScreen({super.key, required this.email});
 
   @override
-  _OtpVerificationScreenState createState() => _OtpVerificationScreenState();
+  OtpVerificationScreenState createState() => OtpVerificationScreenState();
 }
 
-class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
+class OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final TextEditingController _otpController = TextEditingController();
   final OtpVerificationController _controller = OtpVerificationController();
   bool _isLoading = false;
