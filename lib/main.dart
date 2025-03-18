@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   static const int sessionDuration = 60 * 60 * 1000;
 
   Future<Widget> _getInitialScreen() async {
-    await Future.delayed(const Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 10));
 
     final connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult.contains(ConnectivityResult.none)) {

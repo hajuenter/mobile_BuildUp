@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shimmer/shimmer.dart';
 import '../services/api_service.dart';
 import '../services/session_manager.dart';
 import '../models/user.dart';
@@ -18,6 +19,9 @@ class SplashScreenState extends State<SplashScreen>
   late AnimationController _controller;
   late Animation<double> _animation;
 
+  bool _showShimmer = true; // Indikator shimmer aktif
+  double _opacity = 0.0; // Opacity logo biasa
+
   @override
   void initState() {
     super.initState();
@@ -29,12 +33,27 @@ class SplashScreenState extends State<SplashScreen>
 
     _animation = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    _startApp();
+    // Shimmer berlangsung selama 5 detik
+    Future.delayed(const Duration(seconds: 5), () {
+      setState(() {
+        _showShimmer = false;
+      });
+
+      // Logo fade-in setelah shimmer selesai dalam 1 detik
+      Future.delayed(const Duration(milliseconds: 300), () {
+        setState(() {
+          _opacity = 1.0;
+        });
+      });
+    });
+
+    // Setelah 10 detik, pindah ke halaman berikutnya
+    Future.delayed(const Duration(seconds: 10), () {
+      _startApp();
+    });
   }
 
   Future<void> _startApp() async {
-    await Future.delayed(const Duration(seconds: 3));
-
     const int maxRetries = 3;
     int attempt = 0;
 
@@ -47,7 +66,7 @@ class SplashScreenState extends State<SplashScreen>
 
         if (user != null && token != null && lastLoginTime != null) {
           final int currentTime = DateTime.now().millisecondsSinceEpoch;
-          const int twoHours = 2 * 60 * 60 * 1000;
+          const int twoHours = 60 * 60 * 1000;
 
           if ((currentTime - lastLoginTime) < twoHours) {
             _navigateTo(HomeScreen(user: user));
@@ -88,14 +107,35 @@ class SplashScreenState extends State<SplashScreen>
       body: Stack(
         children: [
           Center(
-            child: FadeTransition(
-              opacity: _animation,
-              child: SvgPicture.asset(
-                'assets/logonew.svg',
-                width: MediaQuery.of(context).size.width * 0.4,
-                height: MediaQuery.of(context).size.height * 0.3,
-                fit: BoxFit.contain,
-              ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Shimmer effect berjalan selama 5 detik
+                if (_showShimmer)
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey.withAlpha(30),
+                    highlightColor: Colors.white.withAlpha(150),
+                    period: const Duration(seconds: 2),
+                    child: SvgPicture.asset(
+                      'assets/logonew.svg',
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      height: MediaQuery.of(context).size.height * 0.3,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+
+                // Logo biasa dengan efek fade-in
+                AnimatedOpacity(
+                  opacity: _opacity,
+                  duration: const Duration(seconds: 1),
+                  child: SvgPicture.asset(
+                    'assets/logonew.svg',
+                    width: MediaQuery.of(context).size.width * 0.4,
+                    height: MediaQuery.of(context).size.height * 0.3,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
             ),
           ),
           Positioned(

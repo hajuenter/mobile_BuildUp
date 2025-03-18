@@ -1,12 +1,12 @@
 class User {
   final int id;
-  final String name;
-  final String email;
-  final String role;
-  final String? noHp;
-  final String? foto;
-  final String? alamat;
-  final String apiKey; // 🔥 API Key harus String, bukan Map!
+  String name;
+  String email;
+  String role;
+  String? noHp;
+  String? foto;
+  String? alamat;
+  final String apiKey; 
 
   User({
     required this.id,

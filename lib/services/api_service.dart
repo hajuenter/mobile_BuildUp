@@ -1,13 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../responses/login_response.dart';
 import '../responses/otp_verification_response.dart';
 import '../responses/register_response.dart';
+import '../responses/profile_response.dart';
 import 'package:flutter/foundation.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.172.97:8000/api';
+  static const String baseUrl = 'http://192.168.224.97:8000/api';
+  static const String baseImageUrl = 'http://192.168.224.97:8000/up/profile/';
   final Dio _dio = Dio();
 
   ApiService() {
@@ -22,12 +26,12 @@ class ApiService {
       onRequest: (options, handler) async {
         final apiKey = await _getApiKey();
         if (apiKey != null) {
-          options.headers["Authorization"] = "Bearer $apiKey";
+          options.headers["X-API-KEY"] = apiKey; // Ubah ini
         }
         return handler.next(options);
       },
       onError: (DioException e, handler) {
-        // print("Dio Error: ${e.response?.data ?? e.message}");
+        debugPrint("Dio Error: ${e.response?.data ?? e.message}");
         return handler.next(e);
       },
     ));
@@ -193,5 +197,95 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     debugPrint("Logout berhasil, API Key dihapus.");
+  }
+
+  Future<ProfileResponse> updateProfile({
+    required String name,
+    required String email,
+    required String noHp,
+    required String alamat,
+    File? image,
+  }) async {
+    try {
+      FormData formData = FormData.fromMap({
+        'name': name,
+        'email': email,
+        'no_hp': noHp,
+        'alamat': alamat,
+        if (image != null)
+          'foto': await MultipartFile.fromFile(
+            image.path,
+            filename: image.path.split('/').last,
+            contentType: MediaType("image", "jpeg"),
+          ),
+      });
+
+      Response response = await _dio.post(
+        '$baseUrl/profile-update',
+        data: formData,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+            'X-API-KEY': await _getApiKey(),
+          },
+        ),
+      );
+
+      return ProfileResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        // Menangkap response dari server
+        if (e.response!.statusCode == 422) {
+          // Error validasi dari Laravel
+          final errors = e.response!.data['errors'];
+          if (errors != null) {
+            throw Exception(_parseValidationErrors(errors));
+          }
+        } else if (e.response!.statusCode == 401) {
+          throw Exception("API Key tidak valid atau sesi berakhir.");
+        } else if (e.response!.statusCode == 500) {
+          throw Exception("Terjadi kesalahan server, coba lagi nanti.");
+        }
+      }
+
+      throw Exception("Gagal memperbarui profil: ${e.message}");
+    }
+  }
+
+  String _parseValidationErrors(Map<String, dynamic> errors) {
+    List<String> messages = [];
+
+    errors.forEach((key, value) {
+      if (value is List) {
+        messages.addAll(value.map((msg) => "• $msg"));
+      }
+    });
+
+    return messages.isNotEmpty
+        ? messages.join("\n")
+        : "Terjadi kesalahan validasi.";
+  }
+
+  Future<Map<String, dynamic>> getProfile() async {
+    try {
+      Response response = await _dio.post(
+        '$baseUrl/profile',
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'X-API-KEY': await _getApiKey(), // Tambahkan API Key di sini
+          },
+        ),
+      );
+
+      if (response.statusCode == 200 && response.data['success'] == true) {
+        return {"success": true, "user": response.data['user']};
+      } else {
+        return {"success": false, "message": "Gagal mengambil data profil"};
+      }
+    } catch (e) {
+      return {"success": false, "message": "Terjadi kesalahan: $e"};
+    }
   }
 }
