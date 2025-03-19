@@ -9,6 +9,7 @@ import '../widgets/custom_wide_card.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import '../widgets/dashboard_chart.dart';
 import 'profile_screen.dart';
+import '../screens/data_and_verifikasi_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -40,21 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       apiKey = key;
     });
-
-    _checkSession();
-  }
-
-  Future<void> _checkSession() async {
-    final int? lastLoginTime = await SessionManager.getLastLoginTime();
-
-    if (lastLoginTime != null) {
-      final int currentTime = DateTime.now().millisecondsSinceEpoch;
-      const int oneHours = 60 * 60 * 1000;
-
-      if ((currentTime - lastLoginTime) > oneHours) {
-        _logout();
-      }
-    }
   }
 
   Future<void> _logout() async {
@@ -89,7 +75,13 @@ class _HomeScreenState extends State<HomeScreen> {
         children: screens,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const DataAndVerifikasiScreen()),
+          );
+        },
         backgroundColor: const Color(0xFF0D6EFD),
         shape: const CircleBorder(),
         elevation: 4.0,
@@ -160,13 +152,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.home, color: Colors.white),
-                  onPressed: () => setState(() => _selectedIndex = 0),
+                  icon: const Icon(Icons.people, color: Colors.white),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DataAndVerifikasiScreen(),
+                      ),
+                    );
+                  },
                 ),
                 IconButton(
                   icon: const Icon(Icons.assignment_turned_in,
                       color: Colors.white),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const DataAndVerifikasiScreen(),
+                        settings:
+                            RouteSettings(arguments: 1), 
+                      ),
+                    );
+                  },
                 ),
               ],
             ),

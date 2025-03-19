@@ -299,7 +299,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               _buildInfoField(Icons.phone, "No HP", phoneController),
               _buildInfoField(Icons.location_on, "Alamat", addressController),
               const SizedBox(height: 20),
-              _buildButton('Simpan Perubahan', Color(0xFF0D6EFD), _saveProfile),
+              _buildButton('Edit Profile', Color(0xFF0D6EFD), _saveProfile),
               const SizedBox(height: 10),
               _buildButton(
                   'Logout', Color(0xFFFF001D), _showLogoutConfirmation),

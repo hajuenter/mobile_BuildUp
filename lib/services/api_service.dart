@@ -8,10 +8,12 @@ import '../responses/register_response.dart';
 import '../responses/profile_response.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
+import '../responses/data_cpb_response.dart';
 
 class ApiService {
   static const String baseUrl = 'http://192.168.224.97:8000/api';
   static const String baseImageUrl = 'http://192.168.224.97:8000/up/profile/';
+  static const String baseImageUrlCPB = 'http://192.168.224.97:8000/';
   final Dio _dio = Dio();
 
   ApiService() {
@@ -39,16 +41,28 @@ class ApiService {
 
   Dio get dio => _dio;
 
+  // API Key
   Future<String?> _getApiKey() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString("api_key");
+  }
+
+  Future<bool> isApiAlive() async {
+    try {
+      final response = await dio.get('/status');
+      return response.statusCode == 200;
+    } catch (e) {
+      return false;
+    }
   }
 
   Future<void> _saveApiKey(String apiKey) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("api_key", apiKey);
   }
+  // End API Key
 
+  // Auth
   Future<RegisterResponse?> registerUser(Map<String, dynamic> userData) async {
     try {
       final response = await _dio.post('/register', data: userData);
@@ -184,21 +198,14 @@ class ApiService {
     }
   }
 
-  Future<bool> isApiAlive() async {
-    try {
-      final response = await dio.get('/status');
-      return response.statusCode == 200;
-    } catch (e) {
-      return false;
-    }
-  }
-
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     debugPrint("Logout berhasil, API Key dihapus.");
   }
+  // End Auth
 
+  // Profile
   Future<ProfileResponse> updateProfile({
     required String name,
     required String email,
@@ -288,4 +295,45 @@ class ApiService {
       return {"success": false, "message": "Terjadi kesalahan: $e"};
     }
   }
+  // End Profile
+
+  // data CPB
+  Future<DataCPBResponse> getDataCPB() async {
+    try {
+      Response response = await _dio.get(
+        '$baseUrl/dataCPB',
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'X-API-KEY': await _getApiKey(),
+          },
+        ),
+      );
+
+      return DataCPBResponse.fromJson(response.data);
+    } catch (e) {
+      throw Exception("Gagal mengambil data CPB: $e");
+    }
+  }
+
+  Future<DataCPBResponse> deleteDataCPB(int id) async {
+    try {
+      Response response = await _dio.delete(
+        '$baseUrl/dataCPB/$id',
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'X-API-KEY': await _getApiKey(),
+        }),
+      );
+
+      return DataCPBResponse.fromJson(response.data);
+    } catch (e) {
+      return DataCPBResponse(
+        status: false,
+        message: "Gagal menghapus data: $e",
+        data: [],
+      );
+    }
+  }
+  // Data CPB End
 }
