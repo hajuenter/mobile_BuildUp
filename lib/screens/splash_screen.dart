@@ -62,18 +62,9 @@ class SplashScreenState extends State<SplashScreen>
       if (apiConnected) {
         final User? user = await SessionManager.getUser();
         final String? token = await SessionManager.getApiKey();
-        final int? lastLoginTime = await SessionManager.getLastLoginTime();
 
-        if (user != null && token != null && lastLoginTime != null) {
-          final int currentTime = DateTime.now().millisecondsSinceEpoch;
-          const int twoHours = 60 * 60 * 1000;
-
-          if ((currentTime - lastLoginTime) < twoHours) {
-            _navigateTo(HomeScreen(user: user));
-          } else {
-            await SessionManager.clearSession();
-            _navigateTo(const LoginScreen());
-          }
+        if (user != null && token != null) {
+          _navigateTo(HomeScreen(user: user));
         } else {
           _navigateTo(const LoginScreen());
         }

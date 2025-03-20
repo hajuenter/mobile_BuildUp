@@ -85,46 +85,17 @@ class LoginGoogleController {
     }
   }
 
-  // 🔹 Fungsi untuk mengecek apakah sesi masih berlaku
   Future<void> checkSession(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-    final int? lastLoginTime = prefs.getInt("lastLoginTime");
-    final String? apiKey = prefs.getString("api_key"); // 🔥 Ambil API Key
+    final String? apiKey = prefs.getString("api_key");
 
-    if (lastLoginTime != null && apiKey != null && apiKey.isNotEmpty) {
-      final int now = DateTime.now().millisecondsSinceEpoch;
-      final bool isSessionValid = (now - lastLoginTime) < sessionDuration;
-
-      if (isSessionValid) {
-        // 🔹 Ambil data user dari SharedPreferences
-        final String? userJson = prefs.getString("user");
-        if (userJson != null) {
-          User userData = User.fromJson(jsonDecode(userJson));
-
-          // 🔹 Jika sesi masih berlaku, langsung ke HomeScreen
-          if (context.mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => HomeScreen(user: userData)),
-            );
-          }
-          return;
-        }
+    if (apiKey == null || apiKey.isEmpty) {
+      if (context.mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
       }
-    }
-
-    // 🔹 Jika sesi habis, hapus API Key & redirect ke LoginScreen
-    await prefs.remove("api_key");
-    await prefs.remove("user");
-    await prefs.remove("lastLoginTime");
-
-    if (context.mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => LoginScreen()), // Redirect ke login
-      );
     }
   }
 

@@ -21,8 +21,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  static const int sessionDuration = 60 * 60 * 1000;
-
   Future<Widget> _getInitialScreen() async {
     await Future.delayed(const Duration(seconds: 10));
 
@@ -36,22 +34,15 @@ class MyApp extends StatelessWidget {
       return const SplashScreen();
     }
 
+    // Cek apakah user masih login
     final User? user = await SessionManager.getUser();
     final String? token = await SessionManager.getApiKey();
-    final int? lastLoginTime = await SessionManager.getLastLoginTime();
 
-    if (user != null && token != null && lastLoginTime != null) {
-      final int now = DateTime.now().millisecondsSinceEpoch;
-      final bool isSessionValid = (now - lastLoginTime) < sessionDuration;
-
-      if (isSessionValid) {
-        return HomeScreen(user: user);
-      } else {
-        await SessionManager.clearSession();
-      }
+    if (user != null && token != null) {
+      return HomeScreen(user: user); // Masuk ke Home jika masih login
     }
 
-    return const LoginScreen();
+    return const LoginScreen(); // Jika belum login, masuk ke Login
   }
 
   @override

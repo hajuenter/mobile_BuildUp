@@ -336,4 +336,8 @@ class ApiService {
     }
   }
   // Data CPB End
+
+  // Data Verifikasi
+
+  // Data Verifikasi End
 }
