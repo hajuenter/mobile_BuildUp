@@ -9,11 +9,12 @@ import '../responses/profile_response.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
 import '../responses/data_cpb_response.dart';
+import '../responses/verifikasi_response.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.224.97:8000/api';
-  static const String baseImageUrl = 'http://192.168.224.97:8000/up/profile/';
-  static const String baseImageUrlCPB = 'http://192.168.224.97:8000/';
+  static const String baseUrl = 'http://192.168.139.97:8000/api';
+  static const String baseImageUrl = 'http://192.168.139.97:8000/up/profile/';
+  static const String baseImageUrlCPB = 'http://192.168.139.97:8000/';
   final Dio _dio = Dio();
 
   ApiService() {
@@ -338,6 +339,189 @@ class ApiService {
   // Data CPB End
 
   // Data Verifikasi
+  Future<VerifikasiResponse> addVerifikasiCPB({
+    required File fotoKK,
+    required File fotoKTP,
+    required String nik,
+    required bool kesanggupanBerswadaya,
+    required String tipe,
+    required double penutupAtap,
+    required double rangkaAtap,
+    required double kolom,
+    required double ringBalok,
+    required double dindingPengisi,
+    required double kusen,
+    required double pintu,
+    required double jendela,
+    required double strukturBawah,
+    required double penutupLantai,
+    required double pondasi,
+    required double sloof,
+    required double mck,
+    required double airKotor,
+    required File fotoPenutupAtap,
+    required File fotoRangkaAtap,
+    required File fotoKolom,
+    required File fotoRingBalok,
+    required File fotoDindingPengisi,
+    required File fotoKusen,
+    required File fotoPintu,
+    required File fotoJendela,
+    required File fotoStrukturBawah,
+    required File fotoPenutupLantai,
+    required File fotoPondasi,
+    required File fotoSloof,
+    required File fotoMck,
+    required File fotoAirKotor,
+  }) async {
+    try {
+      FormData formData = FormData.fromMap({
+        'foto_kk': await MultipartFile.fromFile(
+          fotoKK.path,
+          filename: 'foto_kk_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_ktp': await MultipartFile.fromFile(
+          fotoKTP.path,
+          filename: 'foto_ktp_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'nik': nik,
+        'kesanggupan_berswadaya': kesanggupanBerswadaya ? 1 : 0,
+        'tipe': tipe,
+        'penutup_atap': penutupAtap.toString(),
+        'rangka_atap': rangkaAtap.toString(),
+        'kolom': kolom.toString(),
+        'ring_balok': ringBalok.toString(),
+        'dinding_pengisi': dindingPengisi.toString(),
+        'kusen': kusen.toString(),
+        'pintu': pintu.toString(),
+        'jendela': jendela.toString(),
+        'struktur_bawah': strukturBawah.toString(),
+        'penutup_lantai': penutupLantai.toString(),
+        'pondasi': pondasi.toString(),
+        'sloof': sloof.toString(),
+        'mck': mck.toString(),
+        'air_kotor': airKotor.toString(),
+        'foto_penutup_atap': await MultipartFile.fromFile(
+          fotoPenutupAtap.path,
+          filename: 'penutup_atap_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_rangka_atap': await MultipartFile.fromFile(
+          fotoRangkaAtap.path,
+          filename: 'rangka_atap_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_kolom': await MultipartFile.fromFile(
+          fotoKolom.path,
+          filename: 'kolom_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_ring_balok': await MultipartFile.fromFile(
+          fotoRingBalok.path,
+          filename: 'ring_balok_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_dinding_pengisi': await MultipartFile.fromFile(
+          fotoDindingPengisi.path,
+          filename:
+              'dinding_pengisi_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_kusen': await MultipartFile.fromFile(
+          fotoKusen.path,
+          filename: 'kusen_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_pintu': await MultipartFile.fromFile(
+          fotoPintu.path,
+          filename: 'pintu_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_jendela': await MultipartFile.fromFile(
+          fotoJendela.path,
+          filename: 'jendela_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_struktur_bawah': await MultipartFile.fromFile(
+          fotoStrukturBawah.path,
+          filename:
+              'struktur_bawah_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_penutup_lantai': await MultipartFile.fromFile(
+          fotoPenutupLantai.path,
+          filename:
+              'penutup_lantai_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_pondasi': await MultipartFile.fromFile(
+          fotoPondasi.path,
+          filename: 'pondasi_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_sloof': await MultipartFile.fromFile(
+          fotoSloof.path,
+          filename: 'sloof_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_mck': await MultipartFile.fromFile(
+          fotoMck.path,
+          filename: 'mck_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+        'foto_air_kotor': await MultipartFile.fromFile(
+          fotoAirKotor.path,
+          filename: 'air_kotor_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType("image", "jpeg"),
+        ),
+      });
 
+      Response response = await _dio.post(
+        '$baseUrl/verifikasiCPB',
+        data: formData,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+            'X-API-KEY': await _getApiKey(),
+          },
+          sendTimeout: const Duration(minutes: 2),
+          receiveTimeout: const Duration(minutes: 2),
+        ),
+      );
+
+      return VerifikasiResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      debugPrint("Verifikasi CPB Error: ${e.response?.data ?? e.message}");
+
+      if (e.response != null) {
+        if (e.response!.statusCode == 422) {
+          // Validation errors
+          return VerifikasiResponse(
+            success: false,
+            message: "Validasi gagal",
+            errors: e.response!.data['errors'],
+          );
+        } else if (e.response!.statusCode == 401) {
+          return VerifikasiResponse(
+            success: false,
+            message: "Sesi tidak valid atau telah berakhir",
+          );
+        }
+      }
+
+      return VerifikasiResponse(
+        success: false,
+        message: "Gagal menambahkan data verifikasi: ${e.message}",
+      );
+    } catch (e) {
+      return VerifikasiResponse(
+        success: false,
+        message: "Terjadi kesalahan: $e",
+      );
+    }
+  }
   // Data Verifikasi End
 }
