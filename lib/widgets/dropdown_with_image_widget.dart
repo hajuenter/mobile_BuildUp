@@ -28,7 +28,8 @@ class DropdownWithImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dropdownOptions = options ?? kondisiValues.keys.toList();
+    final List<String> dropdownOptions = options ?? kondisiValues.keys.toList();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -49,7 +50,8 @@ class DropdownWithImageWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            items: kondisiValues.keys.map((String key) {
+            // Gunakan dropdownOptions yang sudah didefinisikan untuk items
+            items: dropdownOptions.map((String key) {
               return DropdownMenuItem<String>(
                 value: key,
                 child: Text(key),
