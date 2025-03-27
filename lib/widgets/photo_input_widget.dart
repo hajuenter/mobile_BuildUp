@@ -119,6 +119,18 @@ class PhotoInputWidget extends StatelessWidget {
                       ),
                     ),
                   ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.info_outline, size: 14, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      'Maksimal ukuran foto 10MB',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),

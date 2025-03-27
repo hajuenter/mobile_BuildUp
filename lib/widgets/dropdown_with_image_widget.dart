@@ -50,7 +50,6 @@ class DropdownWithImageWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            // Gunakan dropdownOptions yang sudah didefinisikan untuk items
             items: dropdownOptions.map((String key) {
               return DropdownMenuItem<String>(
                 value: key,
@@ -108,45 +107,94 @@ class DropdownWithImageWidget extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           if (imageFiles[fieldName] != null)
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Stack(
-                children: [
-                  Center(
-                    child: Image.file(
-                      imageFiles[fieldName]!,
-                      width: 90,
-                      height: 90,
-                      fit: BoxFit.cover,
-                    ),
+            Column(
+              children: [
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: () {
-                        onImageRemoved(fieldName);
-                      },
-                      child: Container(
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          size: 18,
-                          color: Colors.white,
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          imageFiles[fieldName]!,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
                         ),
                       ),
-                    ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            onImageRemoved(fieldName);
+                          },
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(4),
+                            child: const Icon(
+                              Icons.close,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.info_outline, size: 14, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      'Maksimal ukuran foto 10MB',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
+            )
+          else
+            Column(
+              children: [
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Belum ada foto',
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.info_outline, size: 14, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      'Maksimal ukuran foto 10MB',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
             ),
         ],
       ),

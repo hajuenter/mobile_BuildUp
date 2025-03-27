@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../responses/data_cpb_response.dart';
 import '../models/data_cpb_model.dart';
 import '../services/api_service.dart';
-import 'data_cpb_detail.dart';
+import 'data_cpb_detail_screen.dart';
 import 'verifikasi_screen.dart';
 
 class DataAndVerifikasiScreen extends StatefulWidget {
@@ -99,7 +99,10 @@ class DataCpbListState extends State<DataCpbList> {
       DataCPBResponse response = await ApiService().deleteDataCPB(id);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(response.message)),
+        SnackBar(
+          content: Text(response.message),
+          backgroundColor: Colors.red,
+        ),
       );
 
       if (response.status) {
@@ -234,7 +237,7 @@ class DataCpbListState extends State<DataCpbList> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) =>
-                                            DataCpbDetail(data: item),
+                                            DataCpbDetailScreen(data: item),
                                       ),
                                     );
                                   },

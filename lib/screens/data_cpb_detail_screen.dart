@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/data_cpb_model.dart';
 
-class DataCpbDetail extends StatelessWidget {
+class DataCpbDetailScreen extends StatelessWidget {
   final DataCPBModel data;
 
-  const DataCpbDetail({super.key, required this.data});
+  const DataCpbDetailScreen({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
