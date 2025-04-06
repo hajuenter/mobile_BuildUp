@@ -12,6 +12,8 @@ class DropdownWithImageWidget extends StatelessWidget {
   final Function(String, ImageSource) onImagePicked;
   final Function(String) onImageRemoved;
   final List<String>? options;
+  final String?
+      serverImageUrl; // Tambahkan properti untuk URL gambar dari server
 
   const DropdownWithImageWidget({
     super.key,
@@ -24,6 +26,7 @@ class DropdownWithImageWidget extends StatelessWidget {
     required this.onImagePicked,
     required this.onImageRemoved,
     this.options,
+    this.serverImageUrl, // URL gambar dari server
   });
 
   @override
@@ -107,6 +110,7 @@ class DropdownWithImageWidget extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           if (imageFiles[fieldName] != null)
+            // Tampilkan file gambar dari perangkat jika ada
             Column(
               children: [
                 Container(
@@ -165,7 +169,89 @@ class DropdownWithImageWidget extends StatelessWidget {
                 ),
               ],
             )
+          else if (serverImageUrl != null && serverImageUrl!.isNotEmpty)
+            // Tampilkan gambar dari server jika tidak ada file gambar baru
+            Column(
+              children: [
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          serverImageUrl!,
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Text(
+                                'Gagal memuat gambar',
+                                style: TextStyle(color: Colors.red),
+                                textAlign: TextAlign.center,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () {
+                            onImageRemoved(fieldName);
+                          },
+                          child: Container(
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                            padding: const EdgeInsets.all(4),
+                            child: const Icon(
+                              Icons.close,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.info_outline, size: 14, color: Colors.grey),
+                    SizedBox(width: 4),
+                    Text(
+                      'Maksimal ukuran foto 10MB',
+                      style: TextStyle(fontSize: 12, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ],
+            )
           else
+            // Tampilkan container kosong jika tidak ada file gambar atau URL
             Column(
               children: [
                 Container(

@@ -303,6 +303,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(height: 10),
               _buildButton(
                   'Logout', Color(0xFFFF001D), _showLogoutConfirmation),
+              const SizedBox(height: 65),
             ],
           ),
         ),

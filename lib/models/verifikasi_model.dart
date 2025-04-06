@@ -78,8 +78,6 @@ class VerifikasiModel {
     return VerifikasiModel(
       fotoKK: json['foto_kk'] ?? '',
       fotoKTP: json['foto_ktp'] ?? '',
-      // fotoKK: json['data']?['foto_kk'] ?? '',
-      // fotoKTP: json['data']?['foto_ktp'] ?? '',
       nik: json['nik'] ?? '',
       kesanggupanBerswadaya: json['kesanggupan_berswadaya'] == 1,
       tipe: json['tipe'] ?? '',

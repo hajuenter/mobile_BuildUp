@@ -50,6 +50,7 @@ dependencies:
   image_picker: ^1.1.2
   http_parser: ^4.1.2
   image: ^4.5.3
+  dio_retry_plus: ^2.0.8
 
 flutter_native_splash:
   color: "#FFFFFF"

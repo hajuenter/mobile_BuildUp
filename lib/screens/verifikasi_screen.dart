@@ -8,11 +8,17 @@ import '../widgets/dropdown_with_image_widget.dart';
 import '../widgets/simple_dropdown_widget.dart';
 import '../widgets/user_info_widget.dart';
 import '../widgets/photo_input_widget.dart';
+import '../services/api_service.dart';
 
 class VerifikasiScreen extends StatefulWidget {
   final DataCPBModel data;
+  final bool isEditing;
 
-  const VerifikasiScreen({super.key, required this.data});
+  const VerifikasiScreen({
+    super.key,
+    required this.data,
+    this.isEditing = false,
+  });
 
   @override
   VerifikasiScreenState createState() => VerifikasiScreenState();
@@ -45,17 +51,202 @@ class VerifikasiScreenState extends State<VerifikasiScreen> {
   Map<String, File?> imageFiles = {};
 
   bool _isLoading = false;
-
+  int? verifikasiId;
+  Map<String, String?> serverImageUrls = {};
   @override
   void initState() {
     super.initState();
     // Initialize image files map
     for (var key in selectedValues.keys) {
       imageFiles[key] = null;
+      serverImageUrls[key] = null;
     }
 
     imageFiles['foto_kk'] = null;
     imageFiles['foto_ktp'] = null;
+    serverImageUrls['foto_kk'] = null;
+    serverImageUrls['foto_ktp'] = null;
+
+    if (widget.isEditing) {
+      _loadExistingData();
+    }
+  }
+
+  Future<void> _loadExistingData() async {
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final existingData =
+          await ApiService().getVerifikasiByNIK(widget.data.nik);
+
+      if (existingData != null && existingData.isNotEmpty) {
+        final idValue = existingData['id'];
+        if (idValue is String) {
+          verifikasiId = int.tryParse(idValue) ?? 0;
+        } else if (idValue is int) {
+          verifikasiId = idValue;
+        } else if (idValue is double) {
+          verifikasiId = idValue.toInt();
+        } else {
+          verifikasiId = 0;
+        }
+
+        // Tambahkan validasi ID
+        if (verifikasiId == null || verifikasiId! <= 0) {
+          throw Exception("ID verifikasi tidak valid atau tidak ditemukan");
+        }
+
+        if (mounted) {
+          setState(() {
+            // Handle kesanggupan_berswadaya - mengkonversi berbagai tipe data yang mungkin
+            var kesanggupanValue = existingData['kesanggupan_berswadaya'];
+            if (kesanggupanValue is bool) {
+              selectedValues['kesanggupan_berswadaya'] =
+                  kesanggupanValue ? "1" : "0";
+            } else if (kesanggupanValue is int) {
+              selectedValues['kesanggupan_berswadaya'] =
+                  kesanggupanValue == 1 ? "1" : "0";
+            } else if (kesanggupanValue is String) {
+              selectedValues['kesanggupan_berswadaya'] =
+                  (kesanggupanValue == "1" ||
+                          kesanggupanValue.toLowerCase() == "true")
+                      ? "1"
+                      : "0";
+            } else {
+              // Default jika tidak bisa menentukan
+              selectedValues['kesanggupan_berswadaya'] = "0";
+            }
+
+            selectedValues['tipe'] = existingData['tipe'];
+            // Pastikan semua nilai memiliki default yang valid jika data dari server null
+            for (String field in _controller.strukturalComponents) {
+              double value = _parseNumericValue(existingData[field] ?? 0.0);
+              selectedValues[field] =
+                  _findKeyByValue(_controller.strukturalValues, value);
+
+              // Tambahkan pengecekan nilai hasil
+              if (selectedValues[field] == null) {
+                selectedValues[field] = _controller.strukturalValues.keys.first;
+              }
+            }
+            // Tangani komponen dengan nilai Ada/Tidak Ada
+            for (String field in ['pondasi', 'sloof', 'air_kotor']) {
+              double value = _parseNumericValue(existingData[field]);
+              selectedValues[field] = value == 1.0 ? "Tidak Ada" : "Ada";
+            }
+
+            // Tangani komponen struktural
+            for (String field in _controller.strukturalComponents) {
+              double value = _parseNumericValue(existingData[field]);
+              selectedValues[field] =
+                  _findKeyByValue(_controller.strukturalValues, value);
+            }
+
+            // Tangani komponen lain menggunakan kondisiValues
+            for (var entry in _controller.sections.entries) {
+              for (String field in entry.value) {
+                // Lewati field yang sudah ditangani
+                if (_controller.strukturalComponents.contains(field) ||
+                    [
+                      'pondasi',
+                      'sloof',
+                      'air_kotor',
+                      'kesanggupan_berswadaya',
+                      'tipe'
+                    ].contains(field)) {
+                  continue;
+                }
+
+                double value = _parseNumericValue(existingData[field]);
+                selectedValues[field] =
+                    _findKeyByValue(_controller.kondisiValues, value);
+              }
+            }
+
+            final baseImageUrl = ApiService.baseImageUrlEditVerifCPB;
+            if (existingData['foto_ktp'] != null) {
+              serverImageUrls['foto_ktp'] =
+                  baseImageUrl + existingData['foto_ktp'];
+            }
+
+            if (existingData['foto_kk'] != null) {
+              serverImageUrls['foto_kk'] =
+                  baseImageUrl + existingData['foto_kk'];
+            }
+
+            // Mengisi URL gambar komponen
+            for (var component in [
+              'penutup_atap',
+              'rangka_atap',
+              'kolom',
+              'ring_balok',
+              'dinding_pengisi',
+              'kusen',
+              'pintu',
+              'jendela',
+              'struktur_bawah',
+              'penutup_lantai',
+              'pondasi',
+              'sloof',
+              'mck',
+              'air_kotor'
+            ]) {
+              if (existingData['foto_$component'] != null) {
+                serverImageUrls[component] =
+                    baseImageUrl + existingData['foto_$component'];
+              } else {
+                debugPrint(
+                    "No existing data found for NIK: ${widget.data.nik}");
+                // Handle case when no data is found
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Data verifikasi tidak ditemukan'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                }
+              }
+            }
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Gagal memuat data: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  double _parseNumericValue(dynamic value) {
+    if (value is int) {
+      return value.toDouble();
+    } else if (value is double) {
+      return value;
+    } else if (value is String) {
+      return double.tryParse(value) ?? 0.0;
+    } else {
+      return 0.0;
+    }
+  }
+
+  String _findKeyByValue(Map<String, double> map, double value) {
+    return map.entries
+        .firstWhere((entry) => (entry.value - value).abs() < 0.001,
+            orElse: () => MapEntry(map.keys.first, map.values.first))
+        .key;
   }
 
   Future<void> _pickImage(String fieldName, ImageSource source) async {
@@ -74,13 +265,25 @@ class VerifikasiScreenState extends State<VerifikasiScreen> {
     setState(() {
       _isLoading = true;
     });
-
-    final success = await _controller.saveData(
-      context: context,
-      data: widget.data,
-      selectedValues: selectedValues,
-      imageFiles: imageFiles,
-    );
+    bool success;
+    if (widget.isEditing && verifikasiId != null) {
+      // Update data yang sudah ada
+      success = await _controller.updateData(
+        context: context,
+        id: verifikasiId!,
+        data: widget.data,
+        selectedValues: selectedValues,
+        imageFiles: imageFiles,
+      );
+    } else {
+      // Simpan data baru
+      success = await _controller.saveData(
+        context: context,
+        data: widget.data,
+        selectedValues: selectedValues,
+        imageFiles: imageFiles,
+      );
+    }
 
     if (!mounted) return;
 
@@ -100,8 +303,8 @@ class VerifikasiScreenState extends State<VerifikasiScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D6EFD),
-        title: const Text(
-          'Data Verifikasi',
+        title: Text(
+          widget.isEditing ? 'Edit Data Verifikasi' : 'Data Verifikasi',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -165,6 +368,7 @@ class VerifikasiScreenState extends State<VerifikasiScreen> {
                   fieldName: 'foto_ktp',
                   title: 'Foto KTP',
                   imageFiles: imageFiles,
+                  serverImageUrl: serverImageUrls['foto_ktp'],
                   onImagePicked: _pickImage,
                   onImageRemoved: (fieldName) {
                     setState(() {
@@ -177,6 +381,7 @@ class VerifikasiScreenState extends State<VerifikasiScreen> {
                   fieldName: 'foto_kk',
                   title: 'Foto Kartu Keluarga',
                   imageFiles: imageFiles,
+                  serverImageUrl: serverImageUrls['foto_kk'],
                   onImagePicked: _pickImage,
                   onImageRemoved: (fieldName) {
                     setState(() {
@@ -229,6 +434,7 @@ class VerifikasiScreenState extends State<VerifikasiScreen> {
                                 imageFiles[fieldName] = null;
                               });
                             },
+                            serverImageUrl: serverImageUrls[field],
                           ),
                         ),
                         const SizedBox(height: 30),

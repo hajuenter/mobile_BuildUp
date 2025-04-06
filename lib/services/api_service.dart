@@ -12,9 +12,10 @@ import '../responses/data_cpb_response.dart';
 import '../responses/verifikasi_response.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.139.97:8000/api';
-  static const String baseImageUrl = 'http://192.168.139.97:8000/up/profile/';
-  static const String baseImageUrlCPB = 'http://192.168.139.97:8000/';
+  static const String baseUrl = 'http://192.168.159.97:8000/api';
+  static const String baseImageUrl = 'http://192.168.159.97:8000/up/profile/';
+  static const String baseImageUrlCPB = 'http://192.168.159.97:8000/';
+  static const String baseImageUrlEditVerifCPB = 'http://192.168.159.97:8000/';
   final Dio _dio = Dio();
 
   ApiService() {
@@ -338,7 +339,7 @@ class ApiService {
   }
   // Data CPB End
 
-  // Data Verifikasi
+  // Add Data Verifikasi
   Future<VerifikasiResponse> addVerifikasiCPB({
     required File fotoKK,
     required File fotoKTP,
@@ -523,5 +524,165 @@ class ApiService {
       );
     }
   }
-  // Data Verifikasi End
+  // Add Data Verifikasi End
+
+  // Update Data Verif CPB
+  Future<VerifikasiResponse> updateVerifikasiCPB({
+    required int id,
+    required String nik,
+    required bool kesanggupanBerswadaya,
+    required String tipe,
+    required double penutupAtap,
+    required double rangkaAtap,
+    required double kolom,
+    required double ringBalok,
+    required double dindingPengisi,
+    required double kusen,
+    required double pintu,
+    required double jendela,
+    required double strukturBawah,
+    required double penutupLantai,
+    required double pondasi,
+    required double sloof,
+    required double mck,
+    required double airKotor,
+    File? fotoKK,
+    File? fotoKTP,
+    File? fotoPenutupAtap,
+    File? fotoRangkaAtap,
+    File? fotoKolom,
+    File? fotoRingBalok,
+    File? fotoDindingPengisi,
+    File? fotoKusen,
+    File? fotoPintu,
+    File? fotoJendela,
+    File? fotoStrukturBawah,
+    File? fotoPenutupLantai,
+    File? fotoPondasi,
+    File? fotoSloof,
+    File? fotoMck,
+    File? fotoAirKotor,
+  }) async {
+    try {
+      // Mapping file-file
+      final fileFields = {
+        'foto_kk': fotoKK,
+        'foto_ktp': fotoKTP,
+        'foto_penutup_atap': fotoPenutupAtap,
+        'foto_rangka_atap': fotoRangkaAtap,
+        'foto_kolom': fotoKolom,
+        'foto_ring_balok': fotoRingBalok,
+        'foto_dinding_pengisi': fotoDindingPengisi,
+        'foto_kusen': fotoKusen,
+        'foto_pintu': fotoPintu,
+        'foto_jendela': fotoJendela,
+        'foto_struktur_bawah': fotoStrukturBawah,
+        'foto_penutup_lantai': fotoPenutupLantai,
+        'foto_pondasi': fotoPondasi,
+        'foto_sloof': fotoSloof,
+        'foto_mck': fotoMck,
+        'foto_air_kotor': fotoAirKotor,
+      };
+
+      final mappedFiles = await _mapFiles(fileFields);
+
+      final formData = FormData.fromMap({
+        '_method':
+            'PUT', // Gunakan _method agar Laravel menangkap ini sebagai PUT
+        'nik': nik,
+        'kesanggupan_berswadaya': kesanggupanBerswadaya ? '1' : '0',
+        'tipe': tipe,
+        'penutup_atap': penutupAtap.toString(),
+        'rangka_atap': rangkaAtap.toString(),
+        'kolom': kolom.toString(),
+        'ring_balok': ringBalok.toString(),
+        'dinding_pengisi': dindingPengisi.toString(),
+        'kusen': kusen.toString(),
+        'pintu': pintu.toString(),
+        'jendela': jendela.toString(),
+        'struktur_bawah': strukturBawah.toString(),
+        'penutup_lantai': penutupLantai.toString(),
+        'pondasi': pondasi.toString(),
+        'sloof': sloof.toString(),
+        'mck': mck.toString(),
+        'air_kotor': airKotor.toString(),
+        ...mappedFiles,
+      });
+
+      debugPrint('===== REQUEST DATA =====');
+      debugPrint('URL: ${'$baseUrl/updateVerifCPB/$id'}');
+      debugPrint('Method: POST (with _method PUT)');
+      debugPrint('Form Fields:');
+      for (var field in formData.fields) {
+        debugPrint('${field.key}: ${field.value}');
+      }
+      debugPrint('Files:');
+      for (var file in formData.files) {
+        debugPrint('${file.key}: ${file.value.filename}');
+      }
+
+      final response = await _dio.post(
+        '$baseUrl/updateVerifCPB/$id',
+        data: formData,
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'X-API-KEY': await _getApiKey(),
+          },
+          sendTimeout: const Duration(minutes: 2),
+          receiveTimeout: const Duration(minutes: 2),
+        ),
+      );
+
+      return VerifikasiResponse.fromJson(response.data);
+    } on DioException catch (e) {
+      debugPrint('Error: ${e.response?.data ?? e.message}');
+      debugPrint('Stack trace: ${e.stackTrace}');
+      return VerifikasiResponse(
+        success: false,
+        message: 'Gagal update data: ${e.message}',
+        errors: e.response?.data['errors'],
+      );
+    }
+  }
+
+  // Helper untuk mengubah file menjadi MultipartFile
+  Future<Map<String, MultipartFile>> _mapFiles(Map<String, File?> files) async {
+    final result = <String, MultipartFile>{};
+
+    for (var entry in files.entries) {
+      final file = entry.value;
+      if (file != null) {
+        result[entry.key] = await MultipartFile.fromFile(file.path,
+            filename: file.path.split('/').last);
+      }
+    }
+
+    return result;
+  }
+
+  // Get Data Verif by NIK
+  Future<Map<String, dynamic>?> getVerifikasiByNIK(String nik) async {
+    try {
+      Response response = await _dio.get(
+        '$baseUrl/getVerifCPB',
+        queryParameters: {'nik': nik},
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'X-API-KEY': await _getApiKey(),
+          },
+        ),
+      );
+
+      if (response.data['success'] == true && response.data['data'] != null) {
+        return response.data['data'];
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error fetching verifikasi data: $e');
+      return null;
+    }
+  }
+  // Get Data Verif by NIK End
 }

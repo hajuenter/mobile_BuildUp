@@ -173,7 +173,7 @@ class DataCpbListState extends State<DataCpbList> {
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: Center(
-                          child: Text("Tidak ada data yang belum dicek.")),
+                          child: Text("Tidak ada data CPB yang terdaftar.")),
                     ),
                   ],
                 );
@@ -287,6 +287,35 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
     });
   }
 
+  Future<bool> _tampilkanKonfirmasiHapus() async {
+    return await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Konfirmasi"),
+            content: Text("Apakah Anda yakin ingin menghapus data ini?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text("Batal"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text("Hapus", style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  Future<void> deleteItem(String id) async {
+    bool konfirmasi = await _tampilkanKonfirmasiHapus();
+    if (konfirmasi) {
+      // Tambahkan logika hapus data di sini
+      fetchData(); // Refresh data setelah menghapus
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -328,7 +357,8 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                     SliverFillRemaining(
                       hasScrollBody: false,
                       child: Center(
-                          child: Text("Tidak ada data yang sudah dicek.")),
+                          child:
+                              Text("Tidak ada data yang sudah di verifikasi.")),
                     ),
                   ],
                 );
@@ -351,7 +381,6 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          // 🔹 Avatar berdasarkan status
                           CircleAvatar(
                             backgroundColor: item.status == "Terverifikasi"
                                 ? Colors.green
@@ -361,9 +390,10 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                                   ? Icons.check
                                   : Icons.close,
                               color: Colors.white,
+                              size: 18,
                             ),
                           ),
-                          SizedBox(width: 10),
+                          SizedBox(width: 8),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,7 +415,31 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                               ],
                             ),
                           ),
-                          Icon(Icons.arrow_forward_ios, color: Colors.grey),
+                          Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(Icons.edit, color: Colors.blue),
+                                onPressed: () async {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => VerifikasiScreen(
+                                        data: item,
+                                        isEditing: true, // Menandakan mode edit
+                                      ),
+                                    ),
+                                  );
+                                  if (result == true) {
+                                    fetchData(); // Refresh data jika ada perubahan
+                                  }
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete, color: Colors.red),
+                                onPressed: () {},
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
