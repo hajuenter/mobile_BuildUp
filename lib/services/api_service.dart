@@ -12,10 +12,10 @@ import '../responses/data_cpb_response.dart';
 import '../responses/verifikasi_response.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.159.97:8000/api';
-  static const String baseImageUrl = 'http://192.168.159.97:8000/up/profile/';
-  static const String baseImageUrlCPB = 'http://192.168.159.97:8000/';
-  static const String baseImageUrlEditVerifCPB = 'http://192.168.159.97:8000/';
+  static const String baseUrl = 'http://192.168.181.97:8000/api';
+  static const String baseImageUrl = 'http://192.168.181.97:8000/up/profile/';
+  static const String baseImageUrlCPB = 'http://192.168.181.97:8000/';
+  static const String baseImageUrlEditVerifCPB = 'http://192.168.181.97:8000/';
   final Dio _dio = Dio();
 
   ApiService() {
@@ -338,6 +338,52 @@ class ApiService {
     }
   }
   // Data CPB End
+
+  // Hapus Data Verifikasi CPB berdasarkan ID CPB
+  Future<VerifikasiResponse> deleteVerifikasiCPBByCpbId(int cpbId) async {
+    try {
+      debugPrint(
+          '🟢 Mengirim permintaan hapus ke: $baseUrl/delete/verifcpb/by-cpb/$cpbId');
+
+      Response response =
+          await _dio.delete('$baseUrl/delete/verifcpb/by-cpb/$cpbId',
+              options: Options(headers: {
+                'Accept': 'application/json',
+                'X-API-KEY': await _getApiKey(),
+              }));
+
+      // Periksa jika respons bukan null dan adalah Map
+      if (response.data != null && response.data is Map<String, dynamic>) {
+        return VerifikasiResponse.fromJson(response.data);
+      }
+
+      // Jika respons null atau bukan format yang diharapkan
+      return VerifikasiResponse(
+        success: response.statusCode == 200,
+        message: response.statusCode == 200
+            ? 'Data berhasil dihapus'
+            : 'Format respons tidak sesuai',
+        errors: response.statusCode != 200
+            ? {'response': 'Format respons tidak valid'}
+            : null,
+      );
+    } catch (e) {
+      debugPrint('🔴 Error: ${e.toString()}');
+
+      if (e is DioException &&
+          e.response != null &&
+          e.response?.data is Map<String, dynamic>) {
+        return VerifikasiResponse.fromJson(e.response?.data);
+      }
+
+      return VerifikasiResponse(
+        success: false,
+        message: 'Terjadi kesalahan: ${e.toString()}',
+        errors: {'exception': e.toString()},
+      );
+    }
+  }
+  // Hapus Data Verifikasi CPB End
 
   // Add Data Verifikasi
   Future<VerifikasiResponse> addVerifikasiCPB({

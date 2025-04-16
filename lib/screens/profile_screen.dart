@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../services/api_service.dart';
 import 'package:image/image.dart' as img;
 import '../widgets/custom_dialog.dart';
-import '../widgets/confirmation_dialog.dart';
+import '../widgets/custom_confirmation_dialog.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User user;
@@ -177,20 +177,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _showLogoutConfirmation() {
-    showDialog(
+  void _showLogoutConfirmation() async {
+    bool confirm = await showCustomConfirmationDialog(
       context: context,
-      builder: (BuildContext context) {
-        return ConfirmationDialog(
-          title: "Konfirmasi Logout",
-          message: "Apakah Anda yakin ingin keluar?",
-          onConfirm: () {
-            Navigator.of(context).pop(); // Tutup modal
-            _logout(); // Jalankan fungsi logout
-          },
-        );
-      },
+      title: "Konfirmasi Logout",
+      message: "Apakah Anda yakin ingin keluar?",
+      confirmText: "Logout",
+      cancelText: "Batal",
+      confirmIcon: Icons.logout, // Icon untuk logout
+      cancelIcon: Icons.close, // Icon untuk batal
+      confirmColor: Color(0xFFFF001D), // Warna biru untuk tombol logout
+      cancelColor: Colors.grey, // Warna abu-abu untuk tombol batal
+      logoSvgAsset: "assets/logonew.svg", // Path ke logo SVG aplikasi Anda
+      logoSize: 40.0, // Ukuran logo yang sedikit lebih besar
     );
+
+    if (confirm) {
+      // Jalankan fungsi logout jika user mengkonfirmasi
+      _logout();
+    }
   }
 
   Future<void> _logout() async {

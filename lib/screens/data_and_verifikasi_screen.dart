@@ -4,6 +4,7 @@ import '../models/data_cpb_model.dart';
 import '../services/api_service.dart';
 import 'data_cpb_detail_screen.dart';
 import 'verifikasi_screen.dart';
+import '../widgets/custom_confirmation_dialog.dart';
 
 class DataAndVerifikasiScreen extends StatefulWidget {
   const DataAndVerifikasiScreen({super.key});
@@ -94,7 +95,19 @@ class DataCpbListState extends State<DataCpbList> {
   }
 
   void _hapusData(int id) async {
-    bool confirm = await _tampilkanKonfirmasiHapus();
+    bool confirm = await showCustomConfirmationDialog(
+      context: context,
+      title: "Konfirmasi Hapus",
+      message: "Apakah Anda yakin ingin menghapus data ini?",
+      confirmText: "Hapus",
+      cancelText: "Batal",
+      confirmIcon: Icons.delete,
+      cancelIcon: Icons.close,
+      confirmColor: Color(0xFFFF001D),
+      logoSvgAsset: "assets/logonew.svg",
+      logoSize: 40.0,
+    );
+
     if (confirm) {
       DataCPBResponse response = await ApiService().deleteDataCPB(id);
       if (!mounted) return;
@@ -109,27 +122,6 @@ class DataCpbListState extends State<DataCpbList> {
         fetchData();
       }
     }
-  }
-
-  Future<bool> _tampilkanKonfirmasiHapus() async {
-    return await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Konfirmasi"),
-            content: Text("Apakah Anda yakin ingin menghapus data ini?"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text("Batal"),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text("Hapus", style: TextStyle(color: Colors.red)),
-              ),
-            ],
-          ),
-        ) ??
-        false;
   }
 
   @override
@@ -287,35 +279,6 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
     });
   }
 
-  Future<bool> _tampilkanKonfirmasiHapus() async {
-    return await showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text("Konfirmasi"),
-            content: Text("Apakah Anda yakin ingin menghapus data ini?"),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
-                child: Text("Batal"),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: Text("Hapus", style: TextStyle(color: Colors.red)),
-              ),
-            ],
-          ),
-        ) ??
-        false;
-  }
-
-  Future<void> deleteItem(String id) async {
-    bool konfirmasi = await _tampilkanKonfirmasiHapus();
-    if (konfirmasi) {
-      // Tambahkan logika hapus data di sini
-      fetchData(); // Refresh data setelah menghapus
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -436,7 +399,82 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                               ),
                               IconButton(
                                 icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {},
+                                onPressed: () async {
+                                  final konfirmasi =
+                                      await showCustomConfirmationDialog(
+                                    context: context,
+                                    title: "Konfirmasi Hapus",
+                                    message:
+                                        "Apakah Anda yakin ingin menghapus data verifikasi ini?",
+                                    confirmText: "Hapus",
+                                    cancelText: "Batal",
+                                    confirmIcon: Icons.delete,
+                                    cancelIcon: Icons.close,
+                                    confirmColor: Color(0xFFFF001D),
+                                    logoSvgAsset: "assets/logonew.svg",
+                                    logoSize: 40.0,
+                                  );
+
+                                  if (!context.mounted) return;
+
+                                  if (konfirmasi) {
+                                    try {
+                                      // Tampilkan loading indicator
+                                      showDialog(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (BuildContext context) {
+                                          return const Center(
+                                              child:
+                                                  CircularProgressIndicator());
+                                        },
+                                      );
+
+                                      debugPrint(
+                                          '🟢 ID CPB yang akan digunakan untuk menghapus: ${item.id}');
+
+                                      // Gunakan method baru yang mengirim ID CPB
+                                      final response = await ApiService()
+                                          .deleteVerifikasiCPBByCpbId(item.id);
+
+                                      if (!context.mounted) return;
+                                      Navigator.of(context)
+                                          .pop(); // Tutup loading dialog
+
+                                      if (!context.mounted) return;
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(response.message),
+                                          backgroundColor: response.success
+                                              ? Colors.green
+                                              : Colors.red,
+                                        ),
+                                      );
+
+                                      if (response.success) {
+                                        fetchData(); // Refresh data setelah berhasil hapus
+                                      } else {
+                                        debugPrint(
+                                            '🔴 Error details: ${response.errors}');
+                                      }
+                                    } catch (e) {
+                                      if (!context.mounted) return;
+                                      Navigator.of(context)
+                                          .pop(); // Tutup loading dialog
+
+                                      if (!context.mounted) return;
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'Terjadi kesalahan tidak terduga: ${e.toString()}'),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
                               ),
                             ],
                           ),
