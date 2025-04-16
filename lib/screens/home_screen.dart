@@ -10,6 +10,7 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import '../widgets/dashboard_chart.dart';
 import 'profile_screen.dart';
 import '../screens/data_and_verifikasi_screen.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -23,11 +24,23 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String? apiKey;
   int _selectedIndex = 0;
+  bool _isLoading = true; // State untuk loading
 
   @override
   void initState() {
     super.initState();
     _loadApiKey();
+    _loadData();
+  }
+
+  // Simulasi loading data
+  Future<void> _loadData() async {
+    await Future.delayed(const Duration(seconds: 4));
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _loadApiKey() async {
@@ -170,8 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => const DataAndVerifikasiScreen(),
-                        settings:
-                            RouteSettings(arguments: 1), 
+                        settings: RouteSettings(arguments: 1),
                       ),
                     );
                   },
@@ -217,6 +229,73 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildImageSliderSkeleton() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: double.infinity,
+        height: 180, // Sesuaikan dengan tinggi CarouselSlider Anda
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  // Skeleton untuk CustomCard
+  Widget _buildCardSkeleton() {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = (screenWidth - 44) / 3;
+
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: cardWidth,
+        height: 110,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  // Skeleton untuk CustomWideCard
+  Widget _buildWideCardSkeleton() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: double.infinity,
+        height: 100,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+  // Skeleton untuk Chart
+  Widget _buildChartSkeleton() {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey[300]!,
+      highlightColor: Colors.grey[100]!,
+      child: Container(
+        width: double.infinity,
+        height: 250,
+        margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
   Widget _buildHomeContent() {
     return SingleChildScrollView(
       child: Column(
@@ -227,7 +306,9 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: const CarouselSliderWidget(),
+              child: _isLoading
+                  ? _buildImageSliderSkeleton()
+                  : const CarouselSliderWidget(),
             ),
           ),
           const SizedBox(height: 20),
@@ -236,45 +317,64 @@ class _HomeScreenState extends State<HomeScreen> {
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
           ),
           const SizedBox(height: 16),
+
+          // Cards dengan skeleton loading
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              alignment: WrapAlignment.center,
-              children: [
-                CustomCard(
-                  title: 'Proses Verifikasi',
-                  count: 108,
-                  color: Colors.yellow,
-                  icon: Icons.home,
-                ),
-                CustomCard(
-                  title: 'Terverifikasi',
-                  count: 27,
-                  color: Colors.blue,
-                  icon: Icons.home,
-                ),
-                CustomCard(
-                  title: 'Masih Layak Huni',
-                  count: 59,
-                  color: Colors.red,
-                  icon: Icons.home,
-                ),
-              ],
-            ),
+            child: _isLoading
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _buildCardSkeleton(),
+                      _buildCardSkeleton(),
+                      _buildCardSkeleton(),
+                    ],
+                  )
+                : Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      CustomCard(
+                        title: 'Proses Verifikasi',
+                        count: 108,
+                        color: Colors.yellow,
+                        icon: Icons.home,
+                      ),
+                      CustomCard(
+                        title: 'Terverifikasi',
+                        count: 27,
+                        color: Colors.blue,
+                        icon: Icons.home,
+                      ),
+                      CustomCard(
+                        title: 'Masih Layak Huni',
+                        count: 59,
+                        color: Colors.red,
+                        icon: Icons.home,
+                      ),
+                    ],
+                  ),
           ),
+
           const SizedBox(height: 16),
+
+          // Wide Card dengan skeleton loading
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: CustomWideCard(
-              title: 'Pengajuan',
-              count: 1990,
-              color: Colors.green,
-              icon: Icons.volunteer_activism,
-            ),
+            child: _isLoading
+                ? _buildWideCardSkeleton()
+                : CustomWideCard(
+                    title: 'Pengajuan',
+                    count: 1990,
+                    color: Colors.green,
+                    icon: Icons.volunteer_activism,
+                  ),
           ),
-          DashboardChart(),
+
+          // Chart dengan skeleton loading
+          _isLoading ? _buildChartSkeleton() : DashboardChart(),
+
           const SizedBox(height: 35),
         ],
       ),
