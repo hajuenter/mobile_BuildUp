@@ -1,12 +1,24 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../models/statistik_data_model.dart';
 
 class DashboardChart extends StatelessWidget {
-  const DashboardChart({super.key});
+  final StatistikDataModel? statistikData;
+
+  const DashboardChart({super.key, required this.statistikData});
 
   @override
   Widget build(BuildContext context) {
+    // Gunakan data dari model statistik, atau nilai default jika null
+    final prosesVerifikasi = statistikData?.prosesVerifikasi ?? 0;
+    final terverifikasi = statistikData?.terverifikasi ?? 0;
+    final masihLayakHuni = statistikData?.masihLayakHuni ?? 0;
+    final pengajuan = statistikData?.pengajuan ?? 0;
+
+    // Tetap menggunakan nilai maxY yang sama seperti di chart asli
+    const double chartMaxY = 5000;
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -20,7 +32,6 @@ class DashboardChart extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withAlpha((255 * 0.1).toInt()),
-                  // Menghindari deprecated
                   blurRadius: 5,
                   spreadRadius: 1,
                   offset: const Offset(0, 3),
@@ -33,13 +44,16 @@ class DashboardChart extends StatelessWidget {
               child: BarChart(
                 BarChartData(
                   alignment: BarChartAlignment.spaceAround,
-                  maxY: 5000, // Menyesuaikan batas tertinggi
+                  maxY: chartMaxY, // Nilai tetap seperti chart asli
                   barGroups: [
+                    _buildBarGroup(0, prosesVerifikasi.toDouble(),
+                        Colors.yellow, Icons.hourglass_bottom),
+                    _buildBarGroup(1, terverifikasi.toDouble(), Colors.blue,
+                        Icons.verified),
                     _buildBarGroup(
-                        0, 108, Colors.yellow, Icons.hourglass_bottom),
-                    _buildBarGroup(1, 27, Colors.blue, Icons.verified),
-                    _buildBarGroup(2, 59, Colors.red, Icons.home),
-                    _buildBarGroup(3, 1990, Colors.green, Icons.assignment),
+                        2, masihLayakHuni.toDouble(), Colors.red, Icons.home),
+                    _buildBarGroup(3, pengajuan.toDouble(), Colors.green,
+                        Icons.assignment),
                   ],
                   borderData: FlBorderData(
                     show: true,
@@ -50,13 +64,11 @@ class DashboardChart extends StatelessWidget {
                     leftTitles: AxisTitles(
                       sideTitles: SideTitles(
                         showTitles: true,
-                        reservedSize:
-                            50, // Tambah lebar agar angka tidak kepotong
-                        interval: 500,
+                        reservedSize: 50,
+                        interval: 500, // Interval tetap seperti chart asli
                         getTitlesWidget: (double value, TitleMeta meta) {
                           return Text(
-                            NumberFormat("#,###")
-                                .format(value.toInt()), // Format angka ribuan
+                            NumberFormat("#,###").format(value.toInt()),
                             style: const TextStyle(
                               fontSize: 10,
                               fontWeight: FontWeight.bold,
@@ -68,9 +80,7 @@ class DashboardChart extends StatelessWidget {
                       ),
                     ),
                     bottomTitles: const AxisTitles(
-                      sideTitles: SideTitles(
-                          showTitles:
-                              false), // Hilangkan teks agar diganti ikon
+                      sideTitles: SideTitles(showTitles: false),
                     ),
                   ),
                 ),
@@ -79,10 +89,10 @@ class DashboardChart extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           SizedBox(
-            width: double.infinity, // Memastikan scroll bekerja dengan baik
-            height: 25, // Sesuaikan tinggi legend
+            width: double.infinity,
+            height: 25,
             child: ListView(
-              scrollDirection: Axis.horizontal, // Bisa digeser ke samping
+              scrollDirection: Axis.horizontal,
               children: [
                 _buildLegend(
                     Icons.hourglass_bottom, "Proses Verifikasi", Colors.yellow),
@@ -97,12 +107,13 @@ class DashboardChart extends StatelessWidget {
     );
   }
 
-  BarChartGroupData _buildBarGroup(int x, int y, Color color, IconData icon) {
+  BarChartGroupData _buildBarGroup(
+      int x, double y, Color color, IconData icon) {
     return BarChartGroupData(
       x: x,
       barRods: [
         BarChartRodData(
-          toY: y.toDouble(),
+          toY: y,
           color: color,
           width: 20,
           borderRadius: BorderRadius.circular(5),

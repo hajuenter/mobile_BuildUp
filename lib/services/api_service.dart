@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
 import '../responses/data_cpb_response.dart';
 import '../responses/verifikasi_response.dart';
+import '../responses/home_statistik_response.dart';
 
 class ApiService {
   static const String baseUrl = 'http://192.168.181.97:8000/api';
@@ -206,6 +207,26 @@ class ApiService {
     debugPrint("Logout berhasil, API Key dihapus.");
   }
   // End Auth
+
+  // Home
+  Future<HomeStatistikResponse> getHomeStatistik() async {
+    try {
+      Response response = await _dio.get(
+        '$baseUrl/home',
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            'X-API-KEY': await _getApiKey(),
+          },
+        ),
+      );
+
+      return HomeStatistikResponse.fromJson(response.data);
+    } catch (e) {
+      throw Exception("Gagal mengambil data statistik: $e");
+    }
+  }
+  // Home End
 
   // Profile
   Future<ProfileResponse> updateProfile({

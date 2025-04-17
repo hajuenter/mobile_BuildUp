@@ -11,6 +11,8 @@ import '../widgets/dashboard_chart.dart';
 import 'profile_screen.dart';
 import '../screens/data_and_verifikasi_screen.dart';
 import 'package:shimmer/shimmer.dart';
+import '../services/api_service.dart';
+import '../models/statistik_data_model.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -26,6 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   bool _isLoading = true; // State untuk loading
 
+  StatistikDataModel? statistikData;
+  final ApiService _apiService = ApiService();
+
   @override
   void initState() {
     super.initState();
@@ -33,14 +38,44 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadData();
   }
 
-  // Simulasi loading data
   Future<void> _loadData() async {
-    await Future.delayed(const Duration(seconds: 4));
-    if (mounted) {
+    await Future.delayed(const Duration(seconds: 3));
+    try {
+      final response = await _apiService.getHomeStatistik();
+      if (response.status) {
+        setState(() {
+          statistikData = response.data;
+          _isLoading = false;
+        });
+      } else {
+        // Tangani kasus respons gagal
+        setState(() {
+          _isLoading = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Gagal memuat data: ${response.message}')),
+          );
+        }
+      }
+    } catch (e) {
       setState(() {
         _isLoading = false;
       });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Terjadi kesalahan: $e')),
+        );
+      }
     }
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await _loadData();
+    return Future.value();
   }
 
   Future<void> _loadApiKey() async {
@@ -297,86 +332,94 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHomeContent() {
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: _isLoading
-                  ? _buildImageSliderSkeleton()
-                  : const CarouselSliderWidget(),
+    return RefreshIndicator(
+      onRefresh: _refreshData,
+      child: SingleChildScrollView(
+        physics:
+            const AlwaysScrollableScrollPhysics(), // Penting untuk RefreshIndicator
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: _isLoading
+                    ? _buildImageSliderSkeleton()
+                    : const CarouselSliderWidget(),
+              ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Text(
-            "Selamat datang, ${widget.user.name}!",
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 20),
+            Text(
+              "Selamat datang, ${widget.user.name}!",
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
+            ),
+            const SizedBox(height: 16),
 
-          // Cards dengan skeleton loading
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: _isLoading
-                ? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildCardSkeleton(),
-                      _buildCardSkeleton(),
-                      _buildCardSkeleton(),
-                    ],
-                  )
-                : Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    alignment: WrapAlignment.center,
-                    children: [
-                      CustomCard(
-                        title: 'Proses Verifikasi',
-                        count: 108,
-                        color: Colors.yellow,
-                        icon: Icons.home,
-                      ),
-                      CustomCard(
-                        title: 'Terverifikasi',
-                        count: 27,
-                        color: Colors.blue,
-                        icon: Icons.home,
-                      ),
-                      CustomCard(
-                        title: 'Masih Layak Huni',
-                        count: 59,
-                        color: Colors.red,
-                        icon: Icons.home,
-                      ),
-                    ],
-                  ),
-          ),
+            // Cards dengan data aktual dari API
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: _isLoading
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildCardSkeleton(),
+                        _buildCardSkeleton(),
+                        _buildCardSkeleton(),
+                      ],
+                    )
+                  : Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      alignment: WrapAlignment.center,
+                      children: [
+                        CustomCard(
+                          title: 'Proses Verifikasi',
+                          count: statistikData?.prosesVerifikasi ?? 0,
+                          color: Colors.yellow,
+                          icon: Icons.home,
+                        ),
+                        CustomCard(
+                          title: 'Terverifikasi',
+                          count: statistikData?.terverifikasi ?? 0,
+                          color: Colors.blue,
+                          icon: Icons.home,
+                        ),
+                        CustomCard(
+                          title: 'Masih Layak Huni',
+                          count: statistikData?.masihLayakHuni ?? 0,
+                          color: Colors.red,
+                          icon: Icons.home,
+                        ),
+                      ],
+                    ),
+            ),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // Wide Card dengan skeleton loading
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: _isLoading
-                ? _buildWideCardSkeleton()
-                : CustomWideCard(
-                    title: 'Pengajuan',
-                    count: 1990,
-                    color: Colors.green,
-                    icon: Icons.volunteer_activism,
-                  ),
-          ),
+            // Wide Card dengan data aktual
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: _isLoading
+                  ? _buildWideCardSkeleton()
+                  : CustomWideCard(
+                      title: 'Pengajuan',
+                      count: statistikData?.pengajuan ?? 0,
+                      color: Colors.green,
+                      icon: Icons.volunteer_activism,
+                    ),
+            ),
 
-          // Chart dengan skeleton loading
-          _isLoading ? _buildChartSkeleton() : DashboardChart(),
+            // Chart dengan skeleton loading
+            _isLoading
+                ? _buildChartSkeleton()
+                : DashboardChart(statistikData: statistikData),
 
-          const SizedBox(height: 35),
-        ],
+            const SizedBox(height: 35),
+          ],
+        ),
       ),
     );
   }
