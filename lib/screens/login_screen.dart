@@ -22,6 +22,7 @@ class LoginScreenState extends State<LoginScreen> {
   final LoginController _loginController = LoginController();
   final LoginGoogleController _loginGoogleController = LoginGoogleController();
   bool _isLoading = false;
+  bool _isGoogleLoading = false;
 
   String? _emailError;
   String? _passwordError;
@@ -45,7 +46,9 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   void _handleGoogleLogin() async {
+    setState(() => _isGoogleLoading = true);
     await _loginGoogleController.loginWithGoogle(context);
+    setState(() => _isGoogleLoading = false);
   }
 
   @override
@@ -177,7 +180,9 @@ class LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 10),
                         InkWell(
-                          onTap: _handleGoogleLogin,
+                          onTap: _isGoogleLoading
+                              ? null
+                              : _handleGoogleLogin, // Nonaktifkan tombol saat loading
                           borderRadius: BorderRadius.circular(15),
                           child: Container(
                             height: 50,
@@ -188,27 +193,37 @@ class LoginScreenState extends State<LoginScreen> {
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black.withAlpha(25),
-                                  blurRadius:
-                                      4, // Kurangi agar tidak terlalu tebal
-                                  spreadRadius:
-                                      1, // Tambahkan sedikit untuk efek lembut
-                                  offset: const Offset(
-                                      0, 2), // Kurangi pergeseran bayangan
+                                  blurRadius: 4,
+                                  spreadRadius: 1,
+                                  offset: const Offset(0, 2),
                                 ),
                               ],
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                SvgPicture.asset(
-                                  'assets/google.svg',
-                                  width: 28,
-                                  height: 28,
-                                ),
+                                if (_isGoogleLoading)
+                                  // Tampilkan loading indicator
+                                  const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors
+                                          .blue, // Sesuaikan warna dengan tema aplikasi
+                                    ),
+                                  )
+                                else
+                                  // Tampilkan icon Google
+                                  SvgPicture.asset(
+                                    'assets/google.svg',
+                                    width: 28,
+                                    height: 28,
+                                  ),
                                 const SizedBox(width: 12),
-                                const Text(
-                                  'Sign in with Google',
-                                  style: TextStyle(
+                                Text(
+                                  _isGoogleLoading ? '' : 'Sign in with Google',
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
                                     color: Colors.black87,
