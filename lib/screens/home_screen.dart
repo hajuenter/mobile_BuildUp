@@ -289,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
       highlightColor: Colors.grey[100]!,
       child: Container(
         width: cardWidth,
-        height: 160,
+        height: 155,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -334,6 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHomeContent() {
     return RefreshIndicator(
       onRefresh: _refreshData,
+      color: Color(0xFF0D6EFD),
       child: SingleChildScrollView(
         physics:
             const AlwaysScrollableScrollPhysics(), // Penting untuk RefreshIndicator

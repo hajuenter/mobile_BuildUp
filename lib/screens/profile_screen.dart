@@ -63,6 +63,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _saveProfile() async {
     FocusScope.of(context).unfocus();
     FocusManager.instance.primaryFocus?.unfocus();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0D6EFD)),
+        ),
+      ),
+    );
+
     try {
       File? selectedImage;
       if (_image != null) {
@@ -102,13 +113,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _image = null;
       });
       if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return CustomDialog(
             title: "Berhasil",
             message: response.message,
-            imagePath: 'assets/yes.png',
+            svgAsset: 'assets/logonew.svg', // ganti dari imagePath ke svgAsset
             buttonText: "Oke",
             onPressed: () {
               Navigator.of(context).pop();
@@ -126,7 +138,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return CustomDialog(
             title: "Terjadi Kesalahan",
             message: e.toString().replaceAll("Exception: ", ""),
-            imagePath: 'assets/hand.png',
+            svgAsset: 'assets/logonew.svg', // ganti dari imagePath ke svgAsset
             buttonText: "Tutup",
             onPressed: () {
               Navigator.of(context).pop();
@@ -260,6 +272,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: _refreshProfile,
+        color: Color(0xFF0D6EFD),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Column(

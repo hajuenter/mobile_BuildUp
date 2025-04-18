@@ -97,6 +97,11 @@ class SearchAndSortWidget extends StatelessWidget {
             offset: Offset(0, 2),
           ),
         ],
+        border: Border(
+          bottom: BorderSide(
+              color: Color(0xFF0D6EFD),
+              width: 2), // Add blue border at the bottom
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,9 +126,9 @@ class SearchAndSortWidget extends StatelessWidget {
           ),
           SizedBox(height: 12),
 
-          // Modern sorting dropdown
+          // Modern radio buttons for sorting
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 "Urutkan: ",
@@ -132,47 +137,80 @@ class SearchAndSortWidget extends StatelessWidget {
                   color: Colors.grey.shade700,
                 ),
               ),
-              SizedBox(width: 8),
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Color(0xFF0D6EFD)),
-                ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: sortBy,
-                    icon: Icon(Icons.keyboard_arrow_down,
-                        color: Color(0xFF0D6EFD)),
-                    items: [
-                      DropdownMenuItem(
-                        value: "id",
-                        child: Text("ID",
-                            style: TextStyle(color: Color(0xFF0D6EFD))),
-                      ),
-                      DropdownMenuItem(
-                        value: "asc",
-                        child: Text("A-Z",
-                            style: TextStyle(color: Color(0xFF0D6EFD))),
-                      ),
-                      DropdownMenuItem(
-                        value: "desc",
-                        child: Text("Z-A",
-                            style: TextStyle(color: Color(0xFF0D6EFD))),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value != null) {
-                        onSortChanged(value);
-                      }
-                    },
-                  ),
-                ),
+              Row(
+                children: [
+                  _buildSortRadioButton("ID", "id"),
+                  SizedBox(width: 8),
+                  _buildSortRadioButton("A-Z", "asc"),
+                  SizedBox(width: 8),
+                  _buildSortRadioButton("Z-A", "desc"),
+                ],
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSortRadioButton(String label, String value) {
+    bool isSelected = sortBy == value;
+
+    return InkWell(
+      onTap: () => onSortChanged(value),
+      borderRadius: BorderRadius.circular(20),
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? Color(0xFF0D6EFD) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? Color(0xFF0D6EFD) : Colors.grey.shade300,
+            width: 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Color(0xFF0D6EFD).withAlpha(77),
+                    blurRadius: 8,
+                    spreadRadius: 1,
+                    offset: Offset(0, 2),
+                  )
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (isSelected)
+              Container(
+                margin: EdgeInsets.only(right: 6),
+                width: 16,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.check,
+                    size: 12,
+                    color: Color(0xFF0D6EFD),
+                  ),
+                ),
+              ),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.grey.shade700,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -313,12 +351,17 @@ class DataCpbListState extends State<DataCpbList> {
                 fetchData();
                 await Future.delayed(Duration(seconds: 1));
               },
+              color: Color(0xFF0D6EFD),
               child: FutureBuilder<DataCPBResponse>(
                 future: futureDataCPB,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting &&
                       dataCpb.isEmpty) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(
+                        child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Color(0xFF0D6EFD)),
+                    ));
                   } else if (snapshot.hasError) {
                     return Center(child: Text("Gagal memuat data"));
                   }
@@ -367,33 +410,56 @@ class DataCpbListState extends State<DataCpbList> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side:
-                              BorderSide(color: Colors.grey.shade300, width: 1),
+                              BorderSide(color: Color(0xFF0D6EFD), width: 1.5),
                         ),
-                        elevation: 2,
+                        color: Colors.white,
+                        elevation: 3,
+                        shadowColor: Colors.grey.withAlpha(77),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(12),
-                          onTap: () {
-                            Navigator.push(
+                          onTap: () async {
+                            final result = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     VerifikasiScreen(data: item),
                               ),
                             );
+                            if (result == true) {
+                              fetchData();
+                            }
                           },
                           child: Padding(
                             padding: EdgeInsets.all(16),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                CircleAvatar(
-                                  backgroundColor: Color(0xFF0D6EFD),
-                                  radius: 24,
-                                  child: Text(
-                                    item.id.toString(),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
+                                // ID dengan ukuran lebih kecil dan warna putih
+                                Container(
+                                  width: 36,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                        color: Color(0xFF0D6EFD), width: 1.5),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Color(0xFF0D6EFD).withAlpha(38),
+                                        blurRadius: 4,
+                                        spreadRadius: 0,
+                                        offset: Offset(0, 2),
+                                      )
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      item.id.toString(),
+                                      style: TextStyle(
+                                        color: Color(0xFF0D6EFD),
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -407,7 +473,7 @@ class DataCpbListState extends State<DataCpbList> {
                                         item.nama,
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                                          fontSize: 15,
                                         ),
                                       ),
                                       SizedBox(height: 4),
@@ -427,6 +493,7 @@ class DataCpbListState extends State<DataCpbList> {
                                     ],
                                   ),
                                 ),
+                                // Icon tombol tidak diubah sesuai permintaan
                                 Row(
                                   children: [
                                     IconButton(
@@ -572,12 +639,17 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                 fetchData();
                 await Future.delayed(Duration(seconds: 1));
               },
+              color: Color(0xFF0D6EFD),
               child: FutureBuilder<DataCPBResponse>(
                 future: futureVerifikasiCpb,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting &&
                       verifikasiCpb.isEmpty) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(
+                        child: CircularProgressIndicator(
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(Color(0xFF0D6EFD)),
+                    ));
                   } else if (snapshot.hasError) {
                     return Center(child: Text("Gagal memuat data"));
                   }
@@ -626,25 +698,44 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side:
-                              BorderSide(color: Colors.grey.shade300, width: 1),
+                              BorderSide(color: Color(0xFF0D6EFD), width: 1.5),
                         ),
-                        elevation: 2,
+                        color: Colors.white,
+                        elevation: 3,
+                        shadowColor: Colors.grey.withAlpha(77),
                         child: Padding(
                           padding: EdgeInsets.all(16),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              CircleAvatar(
-                                backgroundColor: item.status == "Terverifikasi"
-                                    ? Colors.green
-                                    : Colors.red,
-                                radius: 24,
-                                child: Icon(
-                                  item.status == "Terverifikasi"
-                                      ? Icons.check
-                                      : Icons.close,
-                                  color: Colors.white,
-                                  size: 18,
+                              // Ikon status lebih kecil
+                              Container(
+                                width: 36,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: item.status == "Terverifikasi"
+                                      ? Colors.green
+                                      : Colors.red,
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: (item.status == "Terverifikasi"
+                                          ? Colors.green.withAlpha(51)
+                                          : Colors.red.withAlpha(51)),
+                                      blurRadius: 4,
+                                      spreadRadius: 0,
+                                      offset: Offset(0, 2),
+                                    )
+                                  ],
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    item.status == "Terverifikasi"
+                                        ? Icons.check
+                                        : Icons.close,
+                                    color: Colors.white,
+                                    size: 16, // Ukuran ikon lebih kecil
+                                  ),
                                 ),
                               ),
                               SizedBox(width: 16),
@@ -656,7 +747,7 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                                       item.nama,
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                        fontSize: 15,
                                       ),
                                     ),
                                     SizedBox(height: 4),
@@ -691,7 +782,7 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                                       child: Text(
                                         'Status: ${item.status}',
                                         style: TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 9,
                                           fontWeight: FontWeight.bold,
                                           color: item.status == "Terverifikasi"
                                               ? Colors.green
@@ -752,7 +843,12 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                                             builder: (BuildContext context) {
                                               return const Center(
                                                   child:
-                                                      CircularProgressIndicator());
+                                                      CircularProgressIndicator(
+                                                valueColor:
+                                                    AlwaysStoppedAnimation<
+                                                            Color>(
+                                                        Color(0xFF0D6EFD)),
+                                              ));
                                             },
                                           );
 

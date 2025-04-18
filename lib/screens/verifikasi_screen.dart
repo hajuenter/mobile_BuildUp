@@ -473,7 +473,9 @@ class VerifikasiScreenState extends State<VerifikasiScreen> {
             Container(
               color: Colors.black.withAlpha(76),
               child: const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0D6EFD)),
+                ),
               ),
             ),
         ],
