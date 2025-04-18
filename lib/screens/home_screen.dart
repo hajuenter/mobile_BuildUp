@@ -289,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
       highlightColor: Colors.grey[100]!,
       child: Container(
         width: cardWidth,
-        height: 110,
+        height: 160,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
