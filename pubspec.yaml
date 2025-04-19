@@ -51,6 +51,9 @@ dependencies:
   http_parser: ^4.1.2
   image: ^4.5.3
   dio_retry_plus: ^2.0.8
+  flutter_map: ^8.1.1
+  latlong2: ^0.9.1
+  url_launcher: ^6.3.1
 
 flutter_native_splash:
   color: "#FFFFFF"
