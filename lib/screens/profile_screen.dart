@@ -130,7 +130,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-
+      Navigator.of(context, rootNavigator: true).pop();
       // Tampilkan Modal Error
       showDialog(
         context: context,
@@ -236,8 +236,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           widget.user.noHp = userData['no_hp'];
           widget.user.alamat = userData['alamat'];
           widget.user.foto = userData['foto'];
-          _imageTemp = userData['foto']; // 🔥 Reset ke foto lama dari server
-          _image = null; // 🔥 Hapus gambar yang baru dipilih
+          _imageTemp = userData['foto'];
+          _image = null;
         });
 
         nameController.text = userData['name'];

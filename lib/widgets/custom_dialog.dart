@@ -47,14 +47,20 @@ class CustomDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           // SVG dalam lingkaran biru
+          // SVG dalam lingkaran putih dengan border biru
           Padding(
             padding: const EdgeInsets.only(bottom: 16),
             child: Container(
               height: logoSize + 20,
               width: logoSize + 20,
-              decoration: const BoxDecoration(
-                color: Color(0xFF0D6EFD),
+              decoration: BoxDecoration(
+                color: Colors.white, // Ubah warna background menjadi putih
                 shape: BoxShape.circle,
+                border: Border.all(
+                  // Tambahkan border biru
+                  color: const Color(0xFF0D6EFD),
+                  width: 2.0, // Atur ketebalan border sesuai kebutuhan
+                ),
               ),
               child: Center(
                 child: SvgPicture.asset(

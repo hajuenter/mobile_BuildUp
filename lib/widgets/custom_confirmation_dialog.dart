@@ -58,6 +58,7 @@ class CustomConfirmationDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           // Logo Aplikasi (jika ada)
+          // Logo Aplikasi (jika ada)
           if (logoSvgAsset != null)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
@@ -67,8 +68,13 @@ class CustomConfirmationDialog extends StatelessWidget {
                 width: logoSize + 20,
                 decoration: BoxDecoration(
                   color:
-                      Color(0xFF0D6EFD), // Warna latar belakang lingkaran biru
+                      Colors.white, // Ubah warna latar belakang menjadi putih
                   shape: BoxShape.circle, // Bentuk lingkaran
+                  border: Border.all(
+                    // Tambahkan border biru
+                    color: const Color(0xFF0D6EFD),
+                    width: 2.0, // Atur ketebalan border
+                  ),
                 ),
                 child: Center(
                   child: SvgPicture.asset(
