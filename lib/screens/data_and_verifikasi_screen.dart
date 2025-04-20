@@ -406,11 +406,11 @@ class DataCpbListState extends State<DataCpbList> {
                     itemBuilder: (context, index) {
                       final item = filteredDataCpb[index];
                       return Card(
-                        margin: EdgeInsets.only(bottom: 12),
+                        margin: const EdgeInsets.only(bottom: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                          side:
-                              BorderSide(color: Color(0xFF0D6EFD), width: 1.5),
+                          side: const BorderSide(
+                              color: Color(0xFF0D6EFD), width: 1.5),
                         ),
                         color: Colors.white,
                         elevation: 3,
@@ -429,91 +429,129 @@ class DataCpbListState extends State<DataCpbList> {
                               fetchData();
                             }
                           },
-                          child: Padding(
-                            padding: EdgeInsets.all(16),
+                          child: Container(
+                            height: 110, // Tinggi tetap untuk semua card
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 10),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                // ID dengan ukuran lebih kecil dan warna putih
-                                Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                        color: Color(0xFF0D6EFD), width: 1.5),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Color(0xFF0D6EFD).withAlpha(38),
-                                        blurRadius: 4,
-                                        spreadRadius: 0,
-                                        offset: Offset(0, 2),
-                                      )
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      item.id.toString(),
-                                      style: TextStyle(
-                                        color: Color(0xFF0D6EFD),
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
+                                // ID dengan ukuran lebih kecil dan sedikit ke kanan
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 4),
+                                  child: Container(
+                                    width: 28, // Ukuran lebih kecil
+                                    height: 28, // Ukuran lebih kecil
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                          color: const Color(0xFF0D6EFD),
+                                          width: 1.2),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF0D6EFD)
+                                              .withAlpha(38),
+                                          blurRadius: 3,
+                                          spreadRadius: 0,
+                                          offset: const Offset(0, 1),
+                                        )
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        item.id.toString(),
+                                        style: const TextStyle(
+                                          color: Color(0xFF0D6EFD),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12, // Font lebih kecil
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                                SizedBox(width: 16),
+                                const SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
+                                    mainAxisAlignment: MainAxisAlignment
+                                        .center, // Posisi vertikal di tengah
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         item.nama,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 15,
                                         ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      SizedBox(height: 4),
+                                      const SizedBox(height: 3),
                                       Text(
                                         'NIK: ${item.nik}',
                                         style: TextStyle(
-                                            color: Colors.grey.shade700),
+                                          color: Colors.grey.shade700,
+                                          fontSize: 13,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                      SizedBox(height: 2),
+                                      const SizedBox(height: 2),
                                       Text(
                                         'Alamat: ${item.alamat}',
                                         style: TextStyle(
-                                            color: Colors.grey.shade700),
+                                          color: Colors.grey.shade700,
+                                          fontSize: 13,
+                                        ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
                                   ),
                                 ),
-                                // Icon tombol tidak diubah sesuai permintaan
+                                // Icon tombol lebih kecil dan mepet ke kiri
                                 Row(
+                                  mainAxisSize: MainAxisSize
+                                      .min, // Agar tidak mengambil ruang lebih
                                   children: [
-                                    IconButton(
-                                      icon: Icon(Icons.visibility,
-                                          color: Colors.blue), // Detail
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                DataCpbDetailScreen(data: item),
-                                          ),
-                                        );
-                                      },
+                                    SizedBox(
+                                      width: 32, // Lebih kecil
+                                      height: 32, // Lebih kecil
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(
+                                          Icons.visibility,
+                                          color: Colors.blue,
+                                          size: 25, // Ukuran ikon lebih kecil
+                                        ),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  DataCpbDetailScreen(
+                                                      data: item),
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
-                                    SizedBox(width: 2), // Spasi antara tombol
-                                    IconButton(
-                                      icon: Icon(Icons.delete,
-                                          color: Colors.red), // Hapus
-                                      onPressed: () => _hapusData(item.id),
+                                    const SizedBox(
+                                        width:
+                                            5), // Spasi antara tombol dikurangi
+                                    SizedBox(
+                                      width: 32, // Lebih kecil
+                                      height: 32, // Lebih kecil
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                          size: 25, // Ukuran ikon lebih kecil
+                                        ),
+                                        onPressed: () => _hapusData(item.id),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -703,15 +741,20 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                         color: Colors.white,
                         elevation: 3,
                         shadowColor: Colors.grey.withAlpha(77),
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
+                        child: Container(
+                          height:
+                              125, // Menambahkan tinggi tetap untuk konsistensi
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 16),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // Ikon status lebih kecil
+                              // Icon status lebih ke kiri
                               Container(
                                 width: 36,
                                 height: 36,
+                                margin: EdgeInsets.only(
+                                    left: 0), // Mengatur posisi lebih ke kiri
                                 decoration: BoxDecoration(
                                   color: item.status == "Terverifikasi"
                                       ? Colors.green
@@ -734,14 +777,16 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                                         ? Icons.check
                                         : Icons.close,
                                     color: Colors.white,
-                                    size: 16, // Ukuran ikon lebih kecil
+                                    size: 16,
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 16),
+                              SizedBox(width: 12), // Mengurangi jarak
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize
+                                      .min, // Memastikan kolom tidak melebar
                                   children: [
                                     Text(
                                       item.nama,
@@ -749,12 +794,17 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15,
                                       ),
+                                      maxLines: 1, // Batasi ke 1 baris
+                                      overflow: TextOverflow
+                                          .ellipsis, // Tambahkan ellipsis jika terlalu panjang
                                     ),
                                     SizedBox(height: 4),
                                     Text(
                                       'NIK: ${item.nik}',
                                       style: TextStyle(
                                           color: Colors.grey.shade700),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                     SizedBox(height: 2),
                                     Text(
@@ -793,110 +843,122 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                                   ],
                                 ),
                               ),
-                              Row(
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.edit, color: Colors.blue),
-                                    onPressed: () async {
-                                      final result = await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              VerifikasiScreen(
-                                            data: item,
-                                            isEditing:
-                                                true, // Menandakan mode edit
+                              // Icon edit dan hapus menggunakan InkWell
+                              Container(
+                                margin: EdgeInsets.only(right: 0),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    InkWell(
+                                      onTap: () async {
+                                        final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                VerifikasiScreen(
+                                              data: item,
+                                              isEditing: true,
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                      if (result == true) {
-                                        fetchData(); // Refresh data jika ada perubahan
-                                      }
-                                    },
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () async {
-                                      final konfirmasi =
-                                          await showCustomConfirmationDialog(
-                                        context: context,
-                                        title: "Konfirmasi Hapus",
-                                        message:
-                                            "Apakah Anda yakin ingin menghapus data verifikasi ini?",
-                                        confirmText: "Hapus",
-                                        cancelText: "Batal",
-                                        confirmIcon: Icons.delete,
-                                        cancelIcon: Icons.close,
-                                        confirmColor: Color(0xFFFF001D),
-                                        logoSvgAsset: "assets/logonew.svg",
-                                        logoSize: 40.0,
-                                      );
-
-                                      if (!context.mounted) return;
-
-                                      if (konfirmasi) {
-                                        try {
-                                          // Tampilkan loading indicator
-                                          showDialog(
-                                            context: context,
-                                            barrierDismissible: false,
-                                            builder: (BuildContext context) {
-                                              return const Center(
-                                                  child:
-                                                      CircularProgressIndicator(
-                                                valueColor:
-                                                    AlwaysStoppedAnimation<
-                                                            Color>(
-                                                        Color(0xFF0D6EFD)),
-                                              ));
-                                            },
-                                          );
-
-                                          // Gunakan method baru yang mengirim ID CPB
-                                          final response = await ApiService()
-                                              .deleteVerifikasiCPBByCpbId(
-                                                  item.id);
-
-                                          if (!context.mounted) return;
-                                          Navigator.of(context)
-                                              .pop(); // Tutup loading dialog
-
-                                          if (!context.mounted) return;
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(response.message),
-                                              backgroundColor: response.success
-                                                  ? Colors.red
-                                                  : Colors.red,
-                                            ),
-                                          );
-
-                                          if (response.success) {
-                                            fetchData(); // Refresh data setelah berhasil hapus
-                                          } else {
-                                            debugPrint(
-                                                '🔴 Error details: ${response.errors}');
-                                          }
-                                        } catch (e) {
-                                          if (!context.mounted) return;
-                                          Navigator.of(context)
-                                              .pop(); // Tutup loading dialog
-
-                                          if (!context.mounted) return;
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  'Terjadi kesalahan tidak terduga: ${e.toString()}'),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
+                                        );
+                                        if (result == true) {
+                                          fetchData();
                                         }
-                                      }
-                                    },
-                                  ),
-                                ],
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.all(4),
+                                        child: Icon(Icons.edit,
+                                            color: Colors.blue, size: 25),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        width:
+                                            2), // Jarak antar icon diperkecil
+                                    InkWell(
+                                      onTap: () async {
+                                        final konfirmasi =
+                                            await showCustomConfirmationDialog(
+                                          context: context,
+                                          title: "Konfirmasi Hapus",
+                                          message:
+                                              "Apakah Anda yakin ingin menghapus data verifikasi ini?",
+                                          confirmText: "Hapus",
+                                          cancelText: "Batal",
+                                          confirmIcon: Icons.delete,
+                                          cancelIcon: Icons.close,
+                                          confirmColor: Color(0xFFFF001D),
+                                          logoSvgAsset: "assets/logonew.svg",
+                                          logoSize: 40.0,
+                                        );
+
+                                        if (!context.mounted) return;
+
+                                        if (konfirmasi) {
+                                          try {
+                                            showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (BuildContext context) {
+                                                return const Center(
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                              Color>(
+                                                          Color(0xFF0D6EFD)),
+                                                ));
+                                              },
+                                            );
+
+                                            final response = await ApiService()
+                                                .deleteVerifikasiCPBByCpbId(
+                                                    item.id);
+
+                                            if (!context.mounted) return;
+                                            Navigator.of(context).pop();
+
+                                            if (!context.mounted) return;
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(response.message),
+                                                backgroundColor:
+                                                    response.success
+                                                        ? Colors.red
+                                                        : Colors.red,
+                                              ),
+                                            );
+
+                                            if (response.success) {
+                                              fetchData();
+                                            } else {
+                                              debugPrint(
+                                                  '🔴 Error details: ${response.errors}');
+                                            }
+                                          } catch (e) {
+                                            if (!context.mounted) return;
+                                            Navigator.of(context).pop();
+
+                                            if (!context.mounted) return;
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                    'Terjadi kesalahan tidak terduga: ${e.toString()}'),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.all(4),
+                                        child: Icon(Icons.delete,
+                                            color: Colors.red, size: 25),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
