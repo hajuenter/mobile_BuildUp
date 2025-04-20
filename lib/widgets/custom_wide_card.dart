@@ -18,7 +18,8 @@ class CustomWideCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 20),
+      padding:
+          const EdgeInsets.fromLTRB(20, 7, 20, 20), // kiri, atas, kanan, bawah
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),

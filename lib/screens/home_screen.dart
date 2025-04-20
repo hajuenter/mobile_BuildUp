@@ -311,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
       highlightColor: Colors.grey[100]!,
       child: Container(
         width: double.infinity,
-        height: 100,
+        height: 110,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
