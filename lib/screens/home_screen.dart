@@ -13,6 +13,8 @@ import '../screens/data_and_verifikasi_screen.dart';
 import 'package:shimmer/shimmer.dart';
 import '../services/api_service.dart';
 import '../models/statistik_data_model.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -34,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    initializeDateFormatting('id_ID');
     _loadApiKey();
     _loadData();
   }
@@ -243,16 +246,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.search, color: Colors.grey.shade600),
+                  Icon(Icons.calendar_today_rounded,
+                      color: Colors.grey.shade600, size: 20),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: TextField(
-                      style: const TextStyle(fontSize: 16),
-                      decoration: const InputDecoration(
-                        hintText: "Cari data penerima...",
-                        hintStyle: TextStyle(color: Colors.grey),
-                        border: InputBorder.none,
+                    child: Text(
+                      DateFormat('EEEE, dd MMMM yyyy', 'id_ID')
+                          .format(DateTime.now()),
+                      style: const TextStyle(
+                        color: Colors.grey,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
