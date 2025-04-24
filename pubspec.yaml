@@ -98,6 +98,8 @@ flutter:
     - assets/logonew.svg
     - assets/google.svg
     - assets/image.svg
+    - assets/logobanner1.png
+    - assets/logobanner2.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

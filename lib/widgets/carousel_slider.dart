@@ -12,8 +12,8 @@ class CarouselSliderWidget extends StatefulWidget {
 
 class CarouselSliderWidgetState extends State<CarouselSliderWidget> {
   final List<String> images = [
-    'assets/logo.png',
-    'assets/logo.png',
+    'assets/logobanner1.png',
+    'assets/logobanner2.png',
     'assets/logo.png',
   ];
 

@@ -7,11 +7,11 @@ import '../services/api_service.dart';
 class VerifikasiController {
   // Maps for dropdown values and options (tidak berubah)
   final Map<String, double> kondisiValues = {
-    "Layak": 0.0,
+    "Ada": 0.0,
     "Rusak Ringan": 0.25,
     "Rusak Sedang": 0.5,
     "Rusak Berat": 0.75,
-    "Rusak Total": 1.0,
+    "Tidak Ada": 1.0,
   };
 
   final Map<String, double> strukturalValues = {
@@ -57,8 +57,8 @@ class VerifikasiController {
     'penutup_lantai': 'Penutup Lantai',
     'pondasi': 'Pondasi',
     'sloof': 'Sloof',
-    'mck': 'MCK',
-    'air_kotor': 'Air Kotor',
+    'mck': 'Sanitasi',
+    'air_kotor': 'Air Bersih',
   };
 
   final List<String> strukturalComponents = [
@@ -75,7 +75,7 @@ class VerifikasiController {
     'PINTU DAN JENDELA': ['kusen', 'pintu', 'jendela'],
     'LANTAI': ['struktur_bawah', 'penutup_lantai'],
     'PONDASI': ['pondasi', 'sloof'],
-    'SANITASI': ['mck', 'air_kotor'],
+    '': ['mck', 'air_kotor'],
   };
 
   final ApiService _apiService = ApiService();
