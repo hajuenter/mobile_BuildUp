@@ -128,7 +128,7 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         AspectRatio(
-                          aspectRatio: 3 / 2,
+                          aspectRatio: 4 / 2,
                           child: SvgPicture.asset(
                             'assets/logonew.svg',
                             width: constraints.maxWidth * 0.25,

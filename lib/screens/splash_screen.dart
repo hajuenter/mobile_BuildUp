@@ -109,8 +109,8 @@ class SplashScreenState extends State<SplashScreen>
                     period: const Duration(seconds: 2),
                     child: SvgPicture.asset(
                       'assets/logonew.svg',
-                      width: MediaQuery.of(context).size.width * 0.4,
-                      height: MediaQuery.of(context).size.height * 0.3,
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      height: MediaQuery.of(context).size.height * 0.2,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -121,8 +121,8 @@ class SplashScreenState extends State<SplashScreen>
                   duration: const Duration(seconds: 1),
                   child: SvgPicture.asset(
                     'assets/logonew.svg',
-                    width: MediaQuery.of(context).size.width * 0.4,
-                    height: MediaQuery.of(context).size.height * 0.3,
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    height: MediaQuery.of(context).size.height * 0.2,
                     fit: BoxFit.contain,
                   ),
                 ),

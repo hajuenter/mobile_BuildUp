@@ -70,7 +70,7 @@ class LoginScreenState extends State<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         AspectRatio(
-                          aspectRatio: 3 / 2,
+                          aspectRatio: 4 / 2,
                           child: SvgPicture.asset(
                             'assets/logonew.svg',
                             width: constraints.maxWidth * 0.25,

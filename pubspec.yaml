@@ -57,9 +57,9 @@ dependencies:
 
 flutter_native_splash:
   color: "#FFFFFF"
-  image: assets/logo.png
+  image: assets/logonew.png
   android_12:
-    image: assets/logo.png
+    image: assets/logonew.png
     icon_background_color: "#FFFFFF"
 
 dev_dependencies:
@@ -70,7 +70,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/logo.png"
+  image_path: "assets/logonew.png"
   adaptive_icon_background: "#ffffff"
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -92,7 +92,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/logo.png
+    - assets/logonew.png
     - assets/yes.png
     - assets/hand.png
     - assets/logonew.svg
@@ -100,6 +100,7 @@ flutter:
     - assets/image.svg
     - assets/logobanner1.png
     - assets/logobanner2.png
+    - assets/logobanner3.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

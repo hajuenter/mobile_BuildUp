@@ -13,10 +13,10 @@ import '../responses/verifikasi_response.dart';
 import '../responses/home_statistik_response.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.198.97:8000/api';
-  static const String baseImageUrl = 'http://192.168.198.97:8000/up/profile/';
-  static const String baseImageUrlCPB = 'http://192.168.198.97:8000/';
-  static const String baseImageUrlEditVerifCPB = 'http://192.168.198.97:8000/';
+  static const String baseUrl = 'http://192.168.47.97:8000/api';
+  static const String baseImageUrl = 'http://192.168.47.97:8000/up/profile/';
+  static const String baseImageUrlCPB = 'http://192.168.47.97:8000/';
+  static const String baseImageUrlEditVerifCPB = 'http://192.168.47.97:8000/';
   final Dio _dio = Dio();
 
   ApiService() {

@@ -93,7 +93,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           AspectRatio(
-                            aspectRatio: 3 / 2,
+                            aspectRatio: 4 / 2,
                             child: SvgPicture.asset(
                               'assets/logonew.svg', // Gunakan SvgPicture.asset
                               width: constraints.maxWidth * 0.25,

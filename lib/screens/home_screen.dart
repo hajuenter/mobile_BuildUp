@@ -177,20 +177,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       'Welcome to ',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.normal,
                       ),
                     ),
                     SizedBox(
-                      width: 90,
+                      width: 110,
                       child: AnimatedTextKit(
                         repeatForever: true,
                         animatedTexts: [
                           TypewriterAnimatedText(
-                            'BuildUp',
+                            'NganjukMase',
                             textStyle: const TextStyle(
                               color: Colors.white,
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                             speed: const Duration(milliseconds: 250),
