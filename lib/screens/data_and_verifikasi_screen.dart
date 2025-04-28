@@ -139,7 +139,7 @@ class SearchAndSortWidget extends StatelessWidget {
               ),
               Row(
                 children: [
-                  _buildSortRadioButton("ID", "id"),
+                  _buildSortRadioButton("NO", "NO"),
                   SizedBox(width: 8),
                   _buildSortRadioButton("A-Z", "asc"),
                   SizedBox(width: 8),
@@ -228,7 +228,7 @@ class DataCpbListState extends State<DataCpbList> {
   List<DataCPBModel> dataCpb = [];
   List<DataCPBModel> filteredDataCpb = [];
   TextEditingController searchController = TextEditingController();
-  String sortBy = "id";
+  String sortBy = "NO";
 
   @override
   void initState() {
@@ -248,7 +248,7 @@ class DataCpbListState extends State<DataCpbList> {
   void fetchData() async {
     setState(() {
       futureDataCPB = ApiService().getDataCPB();
-      sortBy = "id";
+      sortBy = "NO";
     });
 
     final response = await futureDataCPB;
@@ -280,7 +280,7 @@ class DataCpbListState extends State<DataCpbList> {
 
   void sortData() {
     setState(() {
-      if (sortBy == "id") {
+      if (sortBy == "NO") {
         filteredDataCpb
             .sort((a, b) => a.id.compareTo(b.id)); // Urutkan berdasarkan ID
       } else if (sortBy == "asc") {
@@ -346,7 +346,7 @@ class DataCpbListState extends State<DataCpbList> {
             child: RefreshIndicator(
               onRefresh: () async {
                 setState(() {
-                  sortBy = "id";
+                  sortBy = "NO";
                 });
                 fetchData();
                 await Future.delayed(Duration(seconds: 1));
@@ -584,7 +584,7 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
   List<DataCPBModel> verifikasiCpb = [];
   List<DataCPBModel> filteredVerifikasiCpb = [];
   TextEditingController searchController = TextEditingController();
-  String sortBy = "id";
+  String sortBy = "NO";
 
   @override
   void initState() {
@@ -604,7 +604,7 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
   void fetchData() async {
     setState(() {
       futureVerifikasiCpb = ApiService().getDataCPB();
-      sortBy = "id";
+      sortBy = "NO";
     });
 
     final response = await futureVerifikasiCpb;
@@ -636,7 +636,7 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
 
   void sortData() {
     setState(() {
-      if (sortBy == "id") {
+      if (sortBy == "NO") {
         filteredVerifikasiCpb
             .sort((a, b) => a.id.compareTo(b.id)); // Urutkan berdasarkan ID
       } else if (sortBy == "asc") {
@@ -672,7 +672,7 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
             child: RefreshIndicator(
               onRefresh: () async {
                 setState(() {
-                  sortBy = "id";
+                  sortBy = "NO";
                 });
                 fetchData();
                 await Future.delayed(Duration(seconds: 1));
