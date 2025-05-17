@@ -13,10 +13,10 @@ import '../responses/verifikasi_response.dart';
 import '../responses/home_statistik_response.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.47.97:8000/api';
-  static const String baseImageUrl = 'http://192.168.47.97:8000/up/profile/';
-  static const String baseImageUrlCPB = 'http://192.168.47.97:8000/';
-  static const String baseImageUrlEditVerifCPB = 'http://192.168.47.97:8000/';
+  static const String baseUrl = 'http://192.168.131.97:8000/api';
+  static const String baseImageUrl = 'http://192.168.131.97:8000/up/profile/';
+  static const String baseImageUrlCPB = 'http://192.168.131.97:8000/';
+  static const String baseImageUrlEditVerifCPB = 'http://192.168.131.97:8000/';
   final Dio _dio = Dio();
 
   ApiService() {
@@ -72,10 +72,6 @@ class ApiService {
       RegisterResponse registerResponse =
           RegisterResponse.fromJson(response.data);
 
-      if (registerResponse.user?.apiKey != null) {
-        await _saveApiKey(registerResponse.user!.apiKey!);
-      }
-
       return registerResponse;
     } on DioException catch (e) {
       debugPrint("Register Error: ${e.response?.data ?? e.message}");
@@ -123,30 +119,46 @@ class ApiService {
     try {
       final response = await _dio.post('/google-login', data: {"email": email});
 
-      if (response.statusCode == 200 && response.data.containsKey("api_key")) {
-        await _saveApiKey(response.data["api_key"]);
-        return {
-          "success": true,
-          "api_key": response.data["api_key"],
-          "user": response.data["user"]
-        };
+      // Periksa statusCode dan pastikan response.data tidak kosong
+      if (response.statusCode == 200) {
+        // Cek apakah api_key ada di response
+        if (response.data.containsKey("api_key")) {
+          await _saveApiKey(response.data["api_key"]);
+          return {
+            "success": true,
+            "api_key": response.data["api_key"],
+            "user": response.data["user"]
+          };
+        } else {
+          // Jika tidak ada api_key, berarti error dari server
+          return {
+            "success": false,
+            "message": "API key belum tersedia, hubungi admin"
+          };
+        }
       }
     } on DioException catch (e) {
-      // Pastikan menangani error 401 dengan benar
+      // Tangani error berdasarkan status kode
       if (e.response?.statusCode == 401) {
         return {
           "success": false,
           "message": e.response?.data["message"] ??
               "Email tidak terdaftar atau belum diverifikasi"
         };
+      } else if (e.response?.statusCode == 403) {
+        return {
+          "success": false,
+          "message": e.response?.data["message"] ?? "Akses ditolak"
+        };
       }
 
-      // Jika error lain, tampilkan pesan default
+      // Jika error lain
       return {
         "success": false,
         "message": "Terjadi kesalahan saat login dengan Google"
       };
     }
+
     return {"success": false, "message": "Akun anda tidak terdaftar"};
   }
 

@@ -363,7 +363,7 @@ class DataCpbListState extends State<DataCpbList> {
                           AlwaysStoppedAnimation<Color>(Color(0xFF0D6EFD)),
                     ));
                   } else if (snapshot.hasError) {
-                    return Center(child: Text("Gagal memuat data"));
+                    return Center(child: Text("Data CPB kosong"));
                   }
 
                   if (filteredDataCpb.isEmpty) {
@@ -689,7 +689,7 @@ class VerifikasiCpbListState extends State<VerifikasiCpbList> {
                           AlwaysStoppedAnimation<Color>(Color(0xFF0D6EFD)),
                     ));
                   } else if (snapshot.hasError) {
-                    return Center(child: Text("Gagal memuat data"));
+                    return Center(child: Text("Data verifikasi kosong"));
                   }
 
                   if (filteredVerifikasiCpb.isEmpty) {
