@@ -1,0 +1,2 @@
+C:/Users/asus/Dokumen/SEMESTER 4/project/buildup/android/app/.cxx/RelWithDebInfo/24174m15/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/Users/asus/Dokumen/SEMESTER 4/project/buildup/android/app/.cxx/RelWithDebInfo/24174m15/arm64-v8a/CMakeFiles/rebuild_cache.dir
