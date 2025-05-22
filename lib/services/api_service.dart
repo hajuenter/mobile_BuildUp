@@ -724,12 +724,74 @@ class ApiService {
 
       return VerifikasiResponse.fromJson(response.data);
     } on DioException catch (e) {
-      debugPrint('Error: ${e.response?.data ?? e.message}');
+      debugPrint('ApiService.updateVerifikasiCPB - DioException:');
+      debugPrint('  Message: ${e.message}');
+      debugPrint('  Type: ${e.type}');
+      debugPrint('  Response Status: ${e.response?.statusCode}');
+      debugPrint('  Response Data Type: ${e.response?.data.runtimeType}');
+      // Tambahin aja .toString() untuk memastikan data bisa di-print meskipun itu bukan string
+      debugPrint('  Response Data: ${e.response?.data?.toString()}');
       debugPrint('Stack trace: ${e.stackTrace}');
+
+      Map<String, dynamic>? extractedErrors;
+      // Kasih pesan default untuk errornya jika e.message atau e.response.data.message nggk ada
+      String failureMessage = 'Gagal update data: ${e.message ?? "Terjadi kesalahan tidak diketahui."}';
+
+      if (e.response?.data != null) {
+        if (e.response!.data is Map<String, dynamic>) {
+          var responseDataMap = e.response!.data as Map<String, dynamic>;
+          if (responseDataMap.containsKey('message') && responseDataMap['message'] is String) {
+            failureMessage = responseDataMap['message'];
+          }
+          if (responseDataMap.containsKey('errors')) {
+            if (responseDataMap['errors'] is Map<String, dynamic>) {
+              extractedErrors = responseDataMap['errors'] as Map<String, dynamic>;
+            } else {
+              extractedErrors = {'_raw_server_errors': responseDataMap['errors']};
+            }
+          } else {
+            extractedErrors = responseDataMap; // biarin null kalau nggk pengen kirim seluruh isi map
+          }
+        } else if (e.response!.data is List) {
+          // kalau response berupa list coba bungkus dalam map baru
+          failureMessage = 'Gagal update data: Server mengembalikan daftar error.';
+          extractedErrors = {'_server_errors_list': e.response!.data};
+        } else if (e.response!.data is String) {
+          String serverResponseString = e.response!.data.toString().trim();
+          if (serverResponseString.isEmpty) {
+            // kalau string kosong
+            failureMessage = 'Gagal update data: Server mengalami kesalahan internal (kode 500).';
+            extractedErrors = {'_server_error_details': 'Server tidak memberikan detail kesalahan.'};
+          } else {
+            // kalau ada string dari server, tp mungkin html error, misalnya hasil abort 404/500
+            failureMessage = 'Gagal update data: Terjadi kesalahan di server (kode 500).';
+            extractedErrors = {'_raw_server_response': serverResponseString};
+          }
+        } else {
+          // Tipe data lain yang tidak terduga
+          failureMessage = 'Gagal update data: Server memberikan respon dengan format tidak dikenal (kode 500).';
+          extractedErrors = {'_unknown_response_format': e.response!.data.toString()};
+        }
+      } else if (e.response?.statusCode == 500) {
+        // kalau tidak ada response data tapi status 500
+        failureMessage = 'Gagal update data: Server mengalami kesalahan internal (kode 500) tanpa mengirimkan data tambahan.';
+        extractedErrors = {'_server_error_code': e.response!.statusCode.toString()};
+      }
+
       return VerifikasiResponse(
         success: false,
-        message: 'Gagal update data: ${e.message}',
-        errors: e.response?.data['errors'],
+        message: failureMessage,
+        errors: extractedErrors,
+      );
+      // handle exception umum/ atau kamu bisa pake trait/helper buat logging, misal pengen clean
+    } catch (e, stacktrace) {
+      debugPrint('ApiService.updateVerifikasiCPB - Generic Exception:');
+      debugPrint('  Error: $e');
+      debugPrint('  Stacktrace: $stacktrace');
+      return VerifikasiResponse(
+          success: false,
+          message: 'Gagal update data: Terjadi kesalahan internal aplikasi.',
+          errors: {'_internal_error': e.toString()}
       );
     }
   }
