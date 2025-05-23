@@ -49,6 +49,12 @@ class ApiService {
         return handler.next(e);
       },
     ));
+    _dio.interceptors.add(LogInterceptor(
+      request: true,
+      requestBody: true,
+      responseBody: true,
+      error: true,
+    ));
   }
 
   Dio get dio => _dio;
@@ -721,11 +727,13 @@ class ApiService {
           receiveTimeout: const Duration(minutes: 2),
         ),
       );
-
+      debugPrint('Response Status: ${response.statusCode}');
+      debugPrint('Response Data: ${response.data}');
       return VerifikasiResponse.fromJson(response.data);
     } on DioException catch (e) {
-      debugPrint('Error: ${e.response?.data ?? e.message}');
-      debugPrint('Stack trace: ${e.stackTrace}');
+      debugPrint('Dio Error: ${e.response?.statusCode}');
+      debugPrint('Error Data: ${e.response?.data}');
+      debugPrint('Error Message: ${e.message}');
       return VerifikasiResponse(
         success: false,
         message: 'Gagal update data: ${e.message}',
