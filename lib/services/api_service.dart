@@ -731,14 +731,84 @@ class ApiService {
       debugPrint('Response Data: ${response.data}');
       return VerifikasiResponse.fromJson(response.data);
     } on DioException catch (e) {
-      debugPrint('Dio Error: ${e.response?.statusCode}');
-      debugPrint('Error Data: ${e.response?.data}');
-      debugPrint('Error Message: ${e.message}');
+      debugPrint('ApiService.updateVerifikasiCPB - DioException:');
+      debugPrint('  Message: ${e.message}');
+      debugPrint('  Type: ${e.type}');
+      debugPrint('  Response Status: ${e.response?.statusCode}');
+      debugPrint('  Response Data Type: ${e.response?.data.runtimeType}');
+      debugPrint('  Response Data: ${e.response?.data?.toString()}');
+      debugPrint('Stack trace: ${e.stackTrace}');
+
+      Map<String, dynamic>? extractedErrors;
+      String failureMessage =
+          'Gagal update data: ${e.message ?? "Terjadi kesalahan tidak diketahui."}';
+
+      if (e.response?.data != null) {
+        if (e.response!.data is Map<String, dynamic>) {
+          var responseDataMap = e.response!.data as Map<String, dynamic>;
+          if (responseDataMap.containsKey('message') &&
+              responseDataMap['message'] is String) {
+            failureMessage = responseDataMap['message'];
+          }
+          if (responseDataMap.containsKey('errors')) {
+            if (responseDataMap['errors'] is Map<String, dynamic>) {
+              extractedErrors =
+                  responseDataMap['errors'] as Map<String, dynamic>;
+            } else {
+              extractedErrors = {
+                '_raw_server_errors': responseDataMap['errors']
+              };
+            }
+          } else {
+            extractedErrors = responseDataMap;
+          }
+        } else if (e.response!.data is List) {
+          failureMessage =
+              'Gagal update data: Server mengembalikan daftar error.';
+          extractedErrors = {'_server_errors_list': e.response!.data};
+        } else if (e.response!.data is String) {
+          String serverResponseString = e.response!.data.toString().trim();
+          if (serverResponseString.isEmpty) {
+            failureMessage =
+                'Gagal update data: Server mengalami kesalahan internal (kode 500).';
+            extractedErrors = {
+              '_server_error_details':
+                  'Server tidak memberikan detail kesalahan.'
+            };
+          } else {
+            failureMessage =
+                'Gagal update data: Terjadi kesalahan di server (kode 500).';
+            extractedErrors = {'_raw_server_response': serverResponseString};
+          }
+        } else {
+          failureMessage =
+              'Gagal update data: Server memberikan respon dengan format tidak dikenal (kode 500).';
+          extractedErrors = {
+            '_unknown_response_format': e.response!.data.toString()
+          };
+        }
+      } else if (e.response?.statusCode == 500) {
+        failureMessage =
+            'Gagal update data: Server mengalami kesalahan internal (kode 500) tanpa mengirimkan data tambahan.';
+        extractedErrors = {
+          '_server_error_code': e.response!.statusCode.toString()
+        };
+      }
+
       return VerifikasiResponse(
         success: false,
-        message: 'Gagal update data: ${e.message}',
-        errors: e.response?.data['errors'],
+        message: failureMessage,
+        errors: extractedErrors,
       );
+      // handle exception umum/ atau kamu bisa pake trait/helper buat logging, misal pengen clean
+    } catch (e, stacktrace) {
+      debugPrint('ApiService.updateVerifikasiCPB - Generic Exception:');
+      debugPrint('  Error: $e');
+      debugPrint('  Stacktrace: $stacktrace');
+      return VerifikasiResponse(
+          success: false,
+          message: 'Gagal update data: Terjadi kesalahan internal aplikasi.',
+          errors: {'_internal_error': e.toString()});
     }
   }
 
