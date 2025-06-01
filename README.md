@@ -43,16 +43,48 @@
 
 Berikut adalah beberapa tampilan antarmuka dari aplikasi NganjukMase Mobile:
 
-<img src="screenshoot/satu.jpg" width="250" alt="Splash Screen" />
-<img src="screenshoot/login.jpg" width="250" alt="Login Screen" />
-<img src="screenshoot/daftar.jpg" width="250" alt="Register Screen" />
-<img src="screenshoot/lupapas.jpg" width="250" alt="Lupa Password Screen" />
-<img src="screenshoot/home.jpg" width="250" alt="Home Screen" />
-<img src="screenshoot/verifikasihalaman.jpg" width="250" alt="Verifikasi Data CPB" />
-<img src="screenshoot/daftarhalaman.jpg" width="250" alt="Data CPB" />
-<img src="screenshoot/detailcpb.jpg" width="250" alt="Detail Data CPB" />
-<img src="screenshoot/verif.jpg" width="250" alt="Proses Verifikasi Data CPB" />
-<img src="screenshoot/profil.jpg" width="250" alt="Profil Pengguna" />
+<div style="display: flex; flex-wrap: wrap; gap: 16px;">
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/satu.jpg" width="250" alt="Splash Screen" />
+    <p><em>Splash Screen</em></p>
+  </div>
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/login.jpg" width="250" alt="Login Screen" />
+    <p><em>Login Screen</em></p>
+  </div>
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/daftar.jpg" width="250" alt="Register Screen" />
+    <p><em>Register Screen</em></p>
+  </div>
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/lupapas.jpg" width="250" alt="Lupa Password Screen" />
+    <p><em>Lupa Password Screen</em></p>
+  </div>
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/home.jpg" width="250" alt="Home Screen" />
+    <p><em>Home Screen</em></p>
+  </div>
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/verifikasihalaman.jpg" width="250" alt="Verifikasi Data CPB" />
+    <p><em>Verifikasi Data CPB</em></p>
+  </div>
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/daftarhalaman.jpg" width="250" alt="Data CPB" />
+    <p><em>Data CPB</em></p>
+  </div>
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/detailcpb.jpg" width="250" alt="Detail Data CPB" />
+    <p><em>Detail Data CPB</em></p>
+  </div>
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/verif.jpg" width="250" alt="Proses Verifikasi Data CPB" />
+    <p><em>Proses Verifikasi Data CPB</em></p>
+  </div>
+  <div style="flex: 1 1 200px;">
+    <img src="screenshoot/profil.jpg" width="250" alt="Profil Pengguna" />
+    <p><em>Profil Pengguna</em></p>
+  </div>
+</div>
 
 ## 📥 Cara Menjalankan Proyek (untuk Developer)
 
