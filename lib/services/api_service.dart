@@ -13,18 +13,11 @@ import '../responses/verifikasi_response.dart';
 import '../responses/home_statistik_response.dart';
 
 class ApiService {
-  // static const String baseUrl = 'http://192.168.58.97:8000/api';
-  // static const String baseImageUrl = 'http://192.168.58.97:8000/up/profile/';
-  // static const String baseImageUrlCPB = 'http://192.168.58.97:8000/';
-  // static const String baseImageUrlEditVerifCPB = 'http://192.168.58.97:8000/';
+  static const String baseUrl = 'http://192.168.58.97:8000/api';
+  static const String baseImageUrl = 'http://192.168.58.97:8000/up/profile/';
+  static const String baseImageUrlCPB = 'http://192.168.58.97:8000/';
+  static const String baseImageUrlEditVerifCPB = 'http://192.168.58.97:8000/';
   // Gantilah URL base dari IP lokal ke domain hosting kamu
-  static const String baseUrl = 'https://nganjukmase.pbltifnganjuk.com/api';
-  static const String baseImageUrl =
-      'https://nganjukmase.pbltifnganjuk.com/up/profile/';
-  static const String baseImageUrlCPB =
-      'https://nganjukmase.pbltifnganjuk.com/';
-  static const String baseImageUrlEditVerifCPB =
-      'https://nganjukmase.pbltifnganjuk.com/';
 
   final Dio _dio = Dio();
 

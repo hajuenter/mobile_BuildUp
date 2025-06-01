@@ -43,18 +43,28 @@
 
 Berikut adalah beberapa tampilan antarmuka dari aplikasi NganjukMase Mobile:
 
-![Splash Screen](screenshoot/satu.jpg)
-![Login Screen](screenshoot/login.jpg)
-![Register Screen](screenshoot/daftar.jpg)
-![Lupa Password Screen](screenshoot/lupapas.jpg)
-![Home Screen](screenshoot/home.jpg)
-![Verifikasi Data CPB](screenshoot/verifikasihalaman.jpg)
-![Data CPB](screenshoot/daftarhalaman.jpg)
-![Deatil Data CPB](screenshoot/detailcpb.jpg)
-![Proses Verifikasi Data CPB](screenshoot/verif.jpg)
-![Profil Pengguna](screenshoot/profil.jpg)
+<img src="screenshoot/satu.jpg" width="300" alt="Splash Screen" />
+
+<img src="screenshoot/login.jpg" width="300" alt="Login Screen" />
+
+<img src="screenshoot/daftar.jpg" width="300" alt="Register Screen" />
+
+<img src="screenshoot/lupapas.jpg" width="300" alt="Lupa Password Screen" />
+
+<img src="screenshoot/home.jpg" width="300" alt="Home Screen" />
+
+<img src="screenshoot/verifikasihalaman.jpg" width="300" alt="Verifikasi Data CPB" />
+
+<img src="screenshoot/daftarhalaman.jpg" width="300" alt="Data CPB" />
+
+<img src="screenshoot/detailcpb.jpg" width="300" alt="Detail Data CPB" />
+
+<img src="screenshoot/verif.jpg" width="300" alt="Proses Verifikasi Data CPB" />
+
+<img src="screenshoot/profil.jpg" width="300" alt="Profil Pengguna" />
 
 ## 📥 Cara Menjalankan Proyek (untuk Developer)
+
 ### Prasyarat
 
 Pastikan Anda sudah menginstal:
