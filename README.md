@@ -43,48 +43,26 @@
 
 Berikut adalah beberapa tampilan antarmuka dari aplikasi NganjukMase Mobile:
 
-<div style="display: flex; flex-wrap: wrap; gap: 16px;">
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/satu.jpg" width="250" alt="Splash Screen" />
-    <p><em>Splash Screen</em></p>
-  </div>
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/login.jpg" width="250" alt="Login Screen" />
-    <p><em>Login Screen</em></p>
-  </div>
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/daftar.jpg" width="250" alt="Register Screen" />
-    <p><em>Register Screen</em></p>
-  </div>
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/lupapas.jpg" width="250" alt="Lupa Password Screen" />
-    <p><em>Lupa Password Screen</em></p>
-  </div>
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/home.jpg" width="250" alt="Home Screen" />
-    <p><em>Home Screen</em></p>
-  </div>
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/verifikasihalaman.jpg" width="250" alt="Verifikasi Data CPB" />
-    <p><em>Verifikasi Data CPB</em></p>
-  </div>
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/daftarhalaman.jpg" width="250" alt="Data CPB" />
-    <p><em>Data CPB</em></p>
-  </div>
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/detailcpb.jpg" width="250" alt="Detail Data CPB" />
-    <p><em>Detail Data CPB</em></p>
-  </div>
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/verif.jpg" width="250" alt="Proses Verifikasi Data CPB" />
-    <p><em>Proses Verifikasi Data CPB</em></p>
-  </div>
-  <div style="flex: 1 1 200px;">
-    <img src="screenshoot/profil.jpg" width="250" alt="Profil Pengguna" />
-    <p><em>Profil Pengguna</em></p>
-  </div>
-</div>
+<table>
+  <tr align="center">
+    <td><img src="screenshoot/satu.jpg" width="250" alt="Splash Screen"><br><em>Splash Screen</em></td>
+    <td><img src="screenshoot/login.jpg" width="250" alt="Login Screen"><br><em>Login Screen</em></td>
+    <td><img src="screenshoot/daftar.jpg" width="250" alt="Register Screen"><br><em>Register Screen</em></td>
+  </tr>
+  <tr align="center">
+    <td><img src="screenshoot/lupapas.jpg" width="250" alt="Lupa Password"><br><em>Lupa Password</em></td>
+    <td><img src="screenshoot/home.jpg" width="250" alt="Home Screen"><br><em>Home Screen</em></td>
+    <td><img src="screenshoot/verifikasihalaman.jpg" width="250" alt="Verifikasi Data CPB"><br><em>Verifikasi Data CPB</em></td>
+  </tr>
+  <tr align="center">
+    <td><img src="screenshoot/daftarhalaman.jpg" width="250" alt="Data CPB"><br><em>Data CPB</em></td>
+    <td><img src="screenshoot/detailcpb.jpg" width="250" alt="Detail CPB"><br><em>Detail Data CPB</em></td>
+    <td><img src="screenshoot/verif.jpg" width="250" alt="Proses Verifikasi"><br><em>Proses Verifikasi</em></td>
+  </tr>
+  <tr align="center">
+    <td colspan="3"><img src="screenshoot/profil.jpg" width="250" alt="Profil Pengguna"><br><em>Profil Pengguna</em></td>
+  </tr>
+</table>
 
 ## 📥 Cara Menjalankan Proyek (untuk Developer)
 
